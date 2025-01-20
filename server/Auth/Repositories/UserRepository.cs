@@ -13,9 +13,9 @@ namespace Auth.Repositories
             _context = context;
         }
 
-        public async Task<User?> Get(Guid id)
+        public User? GetByUsername(string username)
         {
-            return await _context.Users.FindAsync(id);
+            return _context.Users.FirstOrDefault((User u) => u.Username == username);
         }
 
         public async Task<bool> Create(User u)

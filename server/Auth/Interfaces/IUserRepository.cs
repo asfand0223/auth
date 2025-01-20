@@ -4,7 +4,7 @@ namespace Auth.Interfaces
 {
     public interface IUserRepository
     {
-        public Task<User?> Get(Guid id);
+        public User? GetByUsername(string username);
         public Task<bool> Create(User u);
     }
 }

@@ -1,0 +1,26 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.control {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  text-align: center;
+  background-color: var(--purple);
+  color: #ffffff;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.control_inactive {
+  background-color: #ffffff;
+  color: var(--purple);
+}
