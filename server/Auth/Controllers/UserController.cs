@@ -51,7 +51,9 @@ namespace Auth.Controllers
                 };
                 bool created = await _userRepository.Create(user);
                 if (!created)
+                {
                     return StatusCode(500, "Failed to create user");
+                }
                 return Ok(new CreateUserResult { Id = id });
             }
             catch (Exception ex)
