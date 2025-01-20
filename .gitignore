@@ -1,0 +1,5 @@
+server/Auth/bin
+server/Auth/obj
+
+client/node_modules
+client/.next
