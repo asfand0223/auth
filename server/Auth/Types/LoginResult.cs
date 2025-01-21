@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Auth.Result
+namespace Auth.Types
 {
     public class LoginResult
     {
@@ -11,5 +11,9 @@ namespace Auth.Result
         [JsonPropertyName("username")]
         [JsonRequired]
         public required string Username { get; set; }
+
+        [JsonPropertyName("access_token")]
+        [JsonRequired]
+        public required string AccessToken { get; set; }
     }
 }

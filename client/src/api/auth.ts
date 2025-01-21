@@ -1,28 +1,28 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
 interface ILoginParams {
   username: string;
   password: string;
 }
 
-interface LoginResponse {
-  id: string;
-  username: string;
+export interface LoginResponse {
+  data: string;
+  error: string;
 }
 
 export const login = async ({
   username,
   password,
-}: ILoginParams): Promise<LoginResponse> => {
-  const response = await axios.post<LoginResponse>(
+}: ILoginParams): Promise<AxiosResponse<any, any>> => {
+  const response = await axios.post(
     `${process.env.NEXT_PUBLIC_AUTH_URL as string}/login`,
     {
       username,
       password,
     },
+    { validateStatus: () => true },
   );
-
-  return response.data;
+  return response;
 };
 
 interface IRegisterParams {
@@ -31,24 +31,25 @@ interface IRegisterParams {
   confirm_password: string;
 }
 
-interface RegisterResponse {
-  id: string;
-  username: string;
+export interface RegisterResponse {
+  data: string;
+  error: string;
 }
 
 export const register = async ({
   username,
   password,
   confirm_password,
-}: IRegisterParams): Promise<RegisterResponse> => {
-  const response = await axios.post<RegisterResponse>(
+}: IRegisterParams): Promise<AxiosResponse<any, any>> => {
+  const response = await axios.post(
     `${process.env.NEXT_PUBLIC_AUTH_URL as string}/register`,
     {
       username,
       password,
       confirm_password,
     },
+    { validateStatus: () => true },
   );
 
-  return response.data;
+  return response;
 };

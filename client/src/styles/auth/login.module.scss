@@ -2,6 +2,7 @@
   width: 100%;
   background-color: #ffffff;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
 }
@@ -28,12 +29,12 @@
   color: #ffffff;
   cursor: pointer;
   opacity: 0.5;
-  transition: opacity 0.1s ease-in-out;
   margin-top: 0.5rem;
+}
 
-  &:hover {
-    opacity: 1;
-  }
+.login_button_active {
+  transition: opacity 0.1s ease-in-out;
+  opacity: 1;
 }
 
 .form_control > input {

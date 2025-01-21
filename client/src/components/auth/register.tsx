@@ -1,15 +1,55 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import styles from "@/styles/auth/register.module.scss";
 import { useDispatch } from "react-redux";
-import { setUsername, setPassword, setConfirmPassword } from "@/redux/register";
-import { register } from "@/api/auth";
-import { setUser } from "@/redux/auth";
+import {
+  setUsername,
+  setPassword,
+  setConfirmPassword,
+  RegisterValidationErrors,
+} from "@/redux/register";
+import { register, RegisterResponse } from "@/api/auth";
+import { setUser, User } from "@/redux/auth";
+import {
+  setError,
+  setValidationErrors,
+  setIsSubmittable,
+} from "@/redux/register";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import Error from "./error";
+import ValidationErrors from "./validation_errors";
 
 const Register = () => {
   const dispatch = useDispatch();
+  const {
+    error,
+    validation_errors,
+    username,
+    password,
+    confirm_password,
+    is_submittable,
+  } = useSelector((state: RootState) => state.register);
   const username_ref = useRef<HTMLInputElement>(null);
   const password_ref = useRef<HTMLInputElement>(null);
   const confirm_password_ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    dispatch(setError({ error: "" }));
+    dispatch(setValidationErrors({ validation_errors: null }));
+  }, []);
+
+  useEffect(() => {
+    dispatch(
+      setIsSubmittable({
+        is_submittable:
+          username !== "" &&
+          password !== "" &&
+          password.length >= 8 &&
+          confirm_password !== "" &&
+          password === confirm_password,
+      }),
+    );
+  }, [username, password, confirm_password]);
 
   const handleUsernameInputChange = () => {
     dispatch(setUsername({ username: username_ref.current?.value ?? "" }));
@@ -38,16 +78,39 @@ const Register = () => {
         password_ref.current.value !== confirm_password_ref.current.value
       )
         return;
-      const user = await register({
+      const response = await register({
         username: username_ref.current.value,
         password: password_ref.current.value,
         confirm_password: confirm_password_ref.current.value,
       });
-      dispatch(
-        setUser({
-          user: { id: user.id, username: user.username, access_token: "" },
-        }),
-      );
+      if (response.status === 200) {
+        dispatch(setError({ error: "" }));
+        dispatch(setValidationErrors({ validation_errors: null }));
+        dispatch(setUsername({ username: "" }));
+        dispatch(setPassword({ password: "" }));
+        dispatch(setConfirmPassword({ confirm_password: "" }));
+        const rr: RegisterResponse = response.data;
+        const user: User = JSON.parse(rr.data);
+        dispatch(
+          setUser({
+            user: {
+              id: user.id,
+              username: user.username,
+              access_token: user.access_token,
+            },
+          }),
+        );
+      } else if (response.data.hasOwnProperty("error")) {
+        const rr: RegisterResponse = response.data;
+        const error = rr.error;
+        dispatch(setError({ error }));
+      } else {
+        const validation_errors_json_string = JSON.stringify(response.data);
+        const validation_errors: RegisterValidationErrors = JSON.parse(
+          validation_errors_json_string,
+        );
+        dispatch(setValidationErrors({ validation_errors }));
+      }
     } catch (e) {
       console.error(e);
     }
@@ -55,6 +118,7 @@ const Register = () => {
 
   return (
     <div className={styles.container}>
+      {error && <Error error={error} />}
       <form className={styles.form} onSubmit={(e) => handleFormSubmit(e)}>
         <div className={styles.form_control}>
           <label>
@@ -67,6 +131,10 @@ const Register = () => {
             ref={username_ref}
             onChange={handleUsernameInputChange}
           />
+          <br />
+          {validation_errors?.Username && (
+            <ValidationErrors validation_errors={validation_errors.Username} />
+          )}
         </div>
         <div className={styles.form_control}>
           <label>
@@ -79,6 +147,10 @@ const Register = () => {
             ref={password_ref}
             onChange={handlePasswordInputChange}
           />
+          <br />
+          {validation_errors?.Password && (
+            <ValidationErrors validation_errors={validation_errors.Password} />
+          )}
         </div>
         <div className={styles.form_control}>
           <label>
@@ -91,9 +163,19 @@ const Register = () => {
             ref={confirm_password_ref}
             onChange={handleConfirmPasswordInputChange}
           />
+          <br />
+          {validation_errors?.ConfirmPassword && (
+            <ValidationErrors
+              validation_errors={validation_errors.ConfirmPassword}
+            />
+          )}
         </div>
         <div className={styles.form_control}>
-          <button className={styles.register_button} type="submit">
+          <button
+            className={`${styles.register_button} ${is_submittable ? styles.register_button_active : ""}`}
+            type="submit"
+            disabled={!is_submittable}
+          >
             Register
           </button>
         </div>

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Auth.DTOs
@@ -6,10 +7,12 @@ namespace Auth.DTOs
     {
         [JsonPropertyName("username")]
         [JsonRequired]
+        [Required]
         public required string Username { get; set; }
 
         [JsonPropertyName("password")]
         [JsonRequired]
+        [Required]
         public required string Password { get; set; }
     }
 }

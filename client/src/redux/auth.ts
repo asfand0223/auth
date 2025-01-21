@@ -6,11 +6,11 @@ export enum AuthType {
   Register = 1,
 }
 
-export type User = {
+export interface User {
   id: string;
   username: string;
   access_token: string;
-};
+}
 
 interface IInitialState {
   user: User | null;

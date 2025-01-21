@@ -1,7 +1,7 @@
+using System.Text.Json;
 using Auth.DTOs;
 using Auth.Interfaces;
-using Auth.Models;
-using Auth.Result;
+using Auth.Types;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Auth.Controllers
@@ -9,37 +9,33 @@ namespace Auth.Controllers
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IAuthService _authService;
 
-        public AuthController(IUserRepository userRepository)
+        public AuthController(IAuthService authService)
         {
-            _userRepository = userRepository;
+            _authService = authService;
         }
 
         [HttpPost("/login")]
-        public IActionResult Login([FromBody] LoginDTO loginDTO)
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
             try
             {
-                if (
-                    string.IsNullOrWhiteSpace(loginDTO.Username)
-                    || string.IsNullOrWhiteSpace(loginDTO.Password)
-                )
+                if (!ModelState.IsValid)
                 {
-                    return BadRequest("Invalid username or password");
+                    return BadRequest(ModelState);
                 }
-                User? existingUser = _userRepository.GetByUsername(loginDTO.Username);
-                if (existingUser == null)
+                AuthResult result = await _authService.Login(loginDTO);
+                await using MemoryStream stream = new MemoryStream();
+                using var reader = new StreamReader(stream);
+                await JsonSerializer.SerializeAsync(stream, result);
+                stream.Position = 0;
+                string json = await reader.ReadToEndAsync();
+                if (!string.IsNullOrWhiteSpace(result.Error))
                 {
-                    return Unauthorized("Invalid username or password");
+                    return Unauthorized(json);
                 }
-                if (loginDTO.Password != existingUser.Password)
-                {
-                    return Unauthorized("Invalid username or password");
-                }
-                return Ok(
-                    new LoginResult { Id = existingUser.Id, Username = existingUser.Username }
-                );
+                return Ok(json);
             }
             catch (Exception ex)
             {
@@ -53,33 +49,21 @@ namespace Auth.Controllers
         {
             try
             {
-                if (
-                    string.IsNullOrWhiteSpace(registerDTO.Username)
-                    || string.IsNullOrWhiteSpace(registerDTO.Password)
-                    || string.IsNullOrWhiteSpace(registerDTO.ConfirmPassword)
-                )
+                if (!ModelState.IsValid)
                 {
-                    return BadRequest("Missing fields");
+                    return BadRequest(ModelState);
                 }
-                if (registerDTO.Password != registerDTO.ConfirmPassword)
+                AuthResult result = await _authService.Register(registerDTO);
+                await using MemoryStream stream = new MemoryStream();
+                using var reader = new StreamReader(stream);
+                await JsonSerializer.SerializeAsync(stream, result);
+                stream.Position = 0;
+                string json = await reader.ReadToEndAsync();
+                if (!string.IsNullOrWhiteSpace(result.Error))
                 {
-                    return BadRequest("Passwords do not match");
+                    return BadRequest(json);
                 }
-
-                Guid id = Guid.NewGuid();
-                User user = new User
-                {
-                    Id = id,
-                    Username = registerDTO.Username,
-                    Password = registerDTO.Password,
-                    CreatedOn = DateTime.UtcNow,
-                };
-                bool created = await _userRepository.Create(user);
-                if (!created)
-                {
-                    return StatusCode(500, "Registration unsuccessful");
-                }
-                return Ok(new RegisterResult { Id = id, Username = registerDTO.Username });
+                return Ok(json);
             }
             catch (Exception ex)
             {
