@@ -71,6 +71,11 @@ const Register = () => {
     try {
       e.preventDefault();
       e.stopPropagation();
+      dispatch(setError({ error: "" }));
+      dispatch(setValidationErrors({ validation_errors: null }));
+      dispatch(setUsername({ username: "" }));
+      dispatch(setPassword({ password: "" }));
+      dispatch(setConfirmPassword({ confirm_password: "" }));
       if (
         !username_ref.current ||
         !password_ref.current ||
@@ -84,11 +89,6 @@ const Register = () => {
         confirm_password: confirm_password_ref.current.value,
       });
       if (response.status === 200) {
-        dispatch(setError({ error: "" }));
-        dispatch(setValidationErrors({ validation_errors: null }));
-        dispatch(setUsername({ username: "" }));
-        dispatch(setPassword({ password: "" }));
-        dispatch(setConfirmPassword({ confirm_password: "" }));
         const rr: RegisterResponse = response.data;
         const user: User = JSON.parse(rr.data);
         dispatch(
@@ -122,7 +122,7 @@ const Register = () => {
       <form className={styles.form} onSubmit={(e) => handleFormSubmit(e)}>
         <div className={styles.form_control}>
           <label>
-            <b>Username</b>
+            <b>Username*</b>
           </label>
           <br />
           <input
@@ -138,7 +138,7 @@ const Register = () => {
         </div>
         <div className={styles.form_control}>
           <label>
-            <b>Password</b>
+            <b>Password* (must be at least 8 characters)</b>
           </label>
           <br />
           <input
@@ -154,7 +154,7 @@ const Register = () => {
         </div>
         <div className={styles.form_control}>
           <label>
-            <b>Confirm Password</b>
+            <b>Confirm Password*</b>
           </label>
           <br />
           <input

@@ -46,16 +46,16 @@ const Login = () => {
     try {
       e.preventDefault();
       e.stopPropagation();
+      dispatch(setError({ error: "" }));
+      dispatch(setValidationErrors({ validation_errors: null }));
+      dispatch(setUsername({ username: "" }));
+      dispatch(setPassword({ password: "" }));
       if (!username_ref.current || !password_ref.current) return;
       const response = await login({
         username: username_ref.current.value,
         password: password_ref.current.value,
       });
       if (response.status === 200) {
-        dispatch(setError({ error: "" }));
-        dispatch(setValidationErrors({ validation_errors: null }));
-        dispatch(setUsername({ username: "" }));
-        dispatch(setPassword({ password: "" }));
         const lr: LoginResponse = response.data;
         const user: User = JSON.parse(lr.data);
         dispatch(
