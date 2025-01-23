@@ -9,8 +9,8 @@ import {
   setUsername,
   setValidationErrors,
 } from "@/redux/login";
-import { login, LoginResponse } from "@/api/auth";
-import { setUser, User } from "@/redux/auth";
+import { ILoginData, login, ILoginResponse } from "@/api/auth";
+import { setAccessToken } from "@/redux/auth";
 import Error from "./error";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -54,19 +54,15 @@ const Login = () => {
         password: password_ref.current.value,
       });
       if (response.status === 200) {
-        const lr: LoginResponse = response.data;
-        const user: User = JSON.parse(lr.data);
+        const lr: ILoginResponse = response.data;
+        const ld: ILoginData = JSON.parse(lr.data);
         dispatch(
-          setUser({
-            user: {
-              id: user.id,
-              username: user.username,
-              access_token: user.access_token,
-            },
+          setAccessToken({
+            access_token: ld.access_token,
           }),
         );
       } else if (response.data.hasOwnProperty("error")) {
-        const lr: LoginResponse = response.data;
+        const lr: ILoginResponse = response.data;
         const error = lr.error;
         dispatch(setError({ error }));
       } else {

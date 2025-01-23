@@ -6,19 +6,13 @@ export enum AuthType {
   Register = 1,
 }
 
-export interface User {
-  id: string;
-  username: string;
-  access_token: string;
-}
-
 interface IInitialState {
-  user: User | null;
+  access_token: string | null;
   auth_type: AuthType;
 }
 
 const initialState: IInitialState = {
-  user: null,
+  access_token: null,
   auth_type: AuthType.Login,
 };
 
@@ -26,16 +20,19 @@ interface ISetAuthType {
   auth_type: AuthType;
 }
 
-interface ISetUser {
-  user: User;
+interface ISetAccessToken {
+  access_token: string;
 }
 
 export const auth_slice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setUser(state: IInitialState, action: PayloadAction<ISetUser>) {
-      state.user = action.payload.user;
+    setAccessToken(
+      state: IInitialState,
+      action: PayloadAction<ISetAccessToken>,
+    ) {
+      state.access_token = action.payload.access_token;
     },
     setAuthType(state: IInitialState, action: PayloadAction<ISetAuthType>) {
       state.auth_type = action.payload.auth_type;
@@ -43,5 +40,5 @@ export const auth_slice = createSlice({
   },
 });
 
-export const { setUser, setAuthType } = auth_slice.actions;
+export const { setAccessToken, setAuthType } = auth_slice.actions;
 export const auth_reducer = auth_slice.reducer;

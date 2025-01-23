@@ -5,9 +5,13 @@ interface ILoginParams {
   password: string;
 }
 
-export interface LoginResponse {
+export interface ILoginResponse {
   data: string;
   error: string;
+}
+
+export interface ILoginData {
+  access_token: string;
 }
 
 export const login = async ({
@@ -31,9 +35,13 @@ interface IRegisterParams {
   confirm_password: string;
 }
 
-export interface RegisterResponse {
+export interface IRegisterResponse {
   data: string;
   error: string;
+}
+
+export interface IRegisterData {
+  access_token: string;
 }
 
 export const register = async ({

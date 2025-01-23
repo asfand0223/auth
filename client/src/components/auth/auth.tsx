@@ -8,12 +8,15 @@ import AuthControl from "./auth_control";
 import styles from "@/styles/auth/auth.module.scss";
 
 const Auth = () => {
-  const { user, auth_type } = useSelector((state: RootState) => state.auth);
+  const { access_token, auth_type } = useSelector(
+    (state: RootState) => state.auth,
+  );
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
         <AuthControl />
-        {!user && (auth_type === AuthType.Register ? <Register /> : <Login />)}
+        {!access_token &&
+          (auth_type === AuthType.Register ? <Register /> : <Login />)}
       </div>
     </div>
   );

@@ -7,8 +7,8 @@ import {
   setConfirmPassword,
   RegisterValidationErrors,
 } from "@/redux/register";
-import { register, RegisterResponse } from "@/api/auth";
-import { setUser, User } from "@/redux/auth";
+import { register, IRegisterResponse, IRegisterData } from "@/api/auth";
+import { setAccessToken } from "@/redux/auth";
 import {
   setError,
   setValidationErrors,
@@ -86,19 +86,15 @@ const Register = () => {
         confirm_password: confirm_password_ref.current.value,
       });
       if (response.status === 200) {
-        const rr: RegisterResponse = response.data;
-        const user: User = JSON.parse(rr.data);
+        const rr: IRegisterResponse = response.data;
+        const rd: IRegisterData = JSON.parse(rr.data);
         dispatch(
-          setUser({
-            user: {
-              id: user.id,
-              username: user.username,
-              access_token: user.access_token,
-            },
+          setAccessToken({
+            access_token: rd.access_token,
           }),
         );
       } else if (response.data.hasOwnProperty("error")) {
-        const rr: RegisterResponse = response.data;
+        const rr: IRegisterResponse = response.data;
         const error = rr.error;
         dispatch(setError({ error }));
       } else {

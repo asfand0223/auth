@@ -38,12 +38,7 @@ namespace Auth.Services
             }
 
             string json = await Json.Write<RegisterResult>(
-                new RegisterResult
-                {
-                    Id = id.Value,
-                    Username = dto.Username,
-                    AccessToken = _ats.Generate(id.Value, dto.Username),
-                }
+                new RegisterResult { AccessToken = _ats.Generate(id.Value, dto.Username) }
             );
             return new AuthenticationResult { Data = json };
         }
@@ -57,12 +52,7 @@ namespace Auth.Services
             }
 
             string json = await Json.Write<LoginResult>(
-                new LoginResult
-                {
-                    Id = result.u.Id,
-                    Username = dto.Username,
-                    AccessToken = _ats.Generate(result.u.Id, dto.Username),
-                }
+                new LoginResult { AccessToken = _ats.Generate(result.u.Id, dto.Username) }
             );
             return new AuthenticationResult { Data = json };
         }
