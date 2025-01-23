@@ -1,7 +1,7 @@
-using System.Text.Json;
 using Auth.DTOs;
 using Auth.Interfaces;
-using Auth.Types;
+using Auth.Results;
+using Auth.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Auth.Controllers
@@ -9,9 +9,9 @@ namespace Auth.Controllers
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthService _authService;
+        private readonly IAuthenticationService _authService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthenticationService authService)
         {
             _authService = authService;
         }
@@ -25,16 +25,14 @@ namespace Auth.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                AuthResult result = await _authService.Login(loginDTO);
-                await using MemoryStream stream = new MemoryStream();
-                using var reader = new StreamReader(stream);
-                await JsonSerializer.SerializeAsync(stream, result);
-                stream.Position = 0;
-                string json = await reader.ReadToEndAsync();
+
+                AuthenticationResult result = await _authService.Login(loginDTO);
+                string json = await Json.Write<AuthenticationResult>(result);
                 if (!string.IsNullOrWhiteSpace(result.Error))
                 {
                     return Unauthorized(json);
                 }
+
                 return Ok(json);
             }
             catch (Exception ex)
@@ -53,16 +51,14 @@ namespace Auth.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                AuthResult result = await _authService.Register(registerDTO);
-                await using MemoryStream stream = new MemoryStream();
-                using var reader = new StreamReader(stream);
-                await JsonSerializer.SerializeAsync(stream, result);
-                stream.Position = 0;
-                string json = await reader.ReadToEndAsync();
+
+                AuthenticationResult result = await _authService.Register(registerDTO);
+                string json = await Json.Write<AuthenticationResult>(result);
                 if (!string.IsNullOrWhiteSpace(result.Error))
                 {
                     return BadRequest(json);
                 }
+
                 return Ok(json);
             }
             catch (Exception ex)

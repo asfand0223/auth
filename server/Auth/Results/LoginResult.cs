@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace Auth.Types
+namespace Auth.Results
 {
-    public class RegisterResult
+    public class LoginResult
     {
         [JsonPropertyName("id")]
         [JsonRequired]

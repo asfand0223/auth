@@ -48,8 +48,6 @@ const Login = () => {
       e.stopPropagation();
       dispatch(setError({ error: "" }));
       dispatch(setValidationErrors({ validation_errors: null }));
-      dispatch(setUsername({ username: "" }));
-      dispatch(setPassword({ password: "" }));
       if (!username_ref.current || !password_ref.current) return;
       const response = await login({
         username: username_ref.current.value,

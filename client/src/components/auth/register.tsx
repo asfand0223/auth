@@ -73,9 +73,6 @@ const Register = () => {
       e.stopPropagation();
       dispatch(setError({ error: "" }));
       dispatch(setValidationErrors({ validation_errors: null }));
-      dispatch(setUsername({ username: "" }));
-      dispatch(setPassword({ password: "" }));
-      dispatch(setConfirmPassword({ confirm_password: "" }));
       if (
         !username_ref.current ||
         !password_ref.current ||
