@@ -18,18 +18,25 @@ namespace Auth.Repositories
             return _context.Users.FirstOrDefault((User u) => u.Username == username);
         }
 
-        public async Task<bool> Create(User u)
+        public async Task<Guid?> Create(string username, string password)
         {
             try
             {
+                User u = new User
+                {
+                    Id = Guid.NewGuid(),
+                    Username = username,
+                    Password = password,
+                    CreatedOn = DateTime.UtcNow,
+                };
                 await _context.AddAsync(u);
                 await _context.SaveChangesAsync();
-                return true;
+                return u.Id;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("UserRepository - Create: " + ex);
-                return false;
+                return null;
             }
         }
     }

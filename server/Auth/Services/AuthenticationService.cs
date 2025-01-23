@@ -8,38 +8,25 @@ namespace Auth.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly IAuthenticationValidationService _authenticationValidationService;
-        private readonly IUserRepository _userRepository;
+        private readonly IAuthenticationValidationService _avs;
+        private readonly IUserService _us;
 
-        public AuthenticationService(
-            IAuthenticationValidationService authValidationService,
-            IUserRepository userRepository
-        )
+        public AuthenticationService(IAuthenticationValidationService avs, IUserService us)
         {
-            _authenticationValidationService = authValidationService;
-            _userRepository = userRepository;
+            _avs = avs;
+            _us = us;
         }
 
         public async Task<AuthenticationResult> Register(RegisterDTO dto)
         {
-            AuthenticationValidationResult atvr = _authenticationValidationService.ValidateRegister(
-                dto
-            );
+            AuthenticationValidationResult atvr = _avs.ValidateRegister(dto);
             if (atvr.Error != null)
             {
                 return new AuthenticationResult { Error = atvr.Error };
             }
 
-            Guid id = Guid.NewGuid();
-            User u = new User
-            {
-                Id = id,
-                Username = dto.Username,
-                Password = dto.Password,
-                CreatedOn = DateTime.UtcNow,
-            };
-            bool c = await _userRepository.Create(u);
-            if (!c)
+            Guid? id = await _us.Create(dto.Username, dto.Password);
+            if (id == null)
             {
                 return new AuthenticationResult { Error = "Failed to create user" };
             }
@@ -47,7 +34,7 @@ namespace Auth.Services
             string json = await Json.Write<RegisterResult>(
                 new RegisterResult
                 {
-                    Id = id,
+                    Id = id.Value,
                     Username = dto.Username,
                     AccessToken = "",
                 }
@@ -57,8 +44,7 @@ namespace Auth.Services
 
         public async Task<AuthenticationResult> Login(LoginDTO dto)
         {
-            (AuthenticationValidationResult avr, User? u) result =
-                _authenticationValidationService.ValidateLogin(dto);
+            (AuthenticationValidationResult avr, User? u) result = _avs.ValidateLogin(dto);
             if (result.avr.Error != null || result.u == null)
             {
                 return new AuthenticationResult { Error = result.avr.Error };
