@@ -10,11 +10,17 @@ namespace Auth.Services
     {
         private readonly IAuthenticationValidationService _avs;
         private readonly IUserService _us;
+        private readonly IAccessTokenService _ats;
 
-        public AuthenticationService(IAuthenticationValidationService avs, IUserService us)
+        public AuthenticationService(
+            IAuthenticationValidationService avs,
+            IUserService us,
+            IAccessTokenService ats
+        )
         {
             _avs = avs;
             _us = us;
+            _ats = ats;
         }
 
         public async Task<AuthenticationResult> Register(RegisterDTO dto)
@@ -36,7 +42,7 @@ namespace Auth.Services
                 {
                     Id = id.Value,
                     Username = dto.Username,
-                    AccessToken = "",
+                    AccessToken = _ats.Generate(id.Value, dto.Username),
                 }
             );
             return new AuthenticationResult { Data = json };
@@ -55,7 +61,7 @@ namespace Auth.Services
                 {
                     Id = result.u.Id,
                     Username = dto.Username,
-                    AccessToken = "",
+                    AccessToken = _ats.Generate(result.u.Id, dto.Username),
                 }
             );
             return new AuthenticationResult { Data = json };
