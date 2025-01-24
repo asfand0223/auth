@@ -1,4 +1,4 @@
-namespace Auth.Interfaces
+namespace Auth.Interfaces.Services
 {
     public interface IAccessTokenService
     {

@@ -6,12 +6,7 @@ interface ILoginParams {
 }
 
 export interface ILoginResponse {
-  data: string;
   error: string;
-}
-
-export interface ILoginData {
-  access_token: string;
 }
 
 export const login = async ({
@@ -24,7 +19,7 @@ export const login = async ({
       username,
       password,
     },
-    { validateStatus: () => true },
+    { validateStatus: () => true, withCredentials: true },
   );
   return response;
 };
@@ -36,12 +31,7 @@ interface IRegisterParams {
 }
 
 export interface IRegisterResponse {
-  data: string;
   error: string;
-}
-
-export interface IRegisterData {
-  access_token: string;
 }
 
 export const register = async ({
@@ -56,7 +46,7 @@ export const register = async ({
       password,
       confirm_password,
     },
-    { validateStatus: () => true },
+    { validateStatus: () => true, withCredentials: true },
   );
 
   return response;

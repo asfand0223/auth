@@ -1,25 +1,26 @@
-using Auth.Interfaces;
+using Auth.Interfaces.Repositories;
+using Auth.Interfaces.Services;
 using Auth.Models;
 
 namespace Auth.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepository _ur;
+        private readonly IUserRepository _userRepository;
 
-        public UserService(IUserRepository ur)
+        public UserService(IUserRepository userRepository)
         {
-            _ur = ur;
+            _userRepository = userRepository;
         }
 
         public User? GetByUsername(string username)
         {
-            return _ur.GetByUsername(username);
+            return _userRepository.GetByUsername(username);
         }
 
         public async Task<Guid?> Create(string username, string password)
         {
-            return await _ur.Create(username, password);
+            return await _userRepository.Create(username, password);
         }
     }
 }

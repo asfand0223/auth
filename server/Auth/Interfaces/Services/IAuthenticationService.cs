@@ -1,11 +1,11 @@
 using Auth.DTOs;
-using Auth.Results;
+using Auth.Entities.Results;
 
-namespace Auth.Interfaces
+namespace Auth.Interfaces.Services
 {
     public interface IAuthenticationService
     {
-        public Task<AuthenticationResult> Register(RegisterDTO registerDTO);
-        public Task<AuthenticationResult> Login(LoginDTO loginDTO);
+        public Task<RegisterResult> Register(RegisterDTO registerDTO);
+        public LoginResult Login(LoginDTO loginDTO);
     }
 }

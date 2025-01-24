@@ -1,5 +1,5 @@
 using Auth.Database;
-using Auth.Interfaces;
+using Auth.Interfaces.Repositories;
 using Auth.Models;
 
 namespace Auth.Repositories

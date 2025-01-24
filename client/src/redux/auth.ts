@@ -20,25 +20,15 @@ interface ISetAuthType {
   auth_type: AuthType;
 }
 
-interface ISetAccessToken {
-  access_token: string;
-}
-
 export const auth_slice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setAccessToken(
-      state: IInitialState,
-      action: PayloadAction<ISetAccessToken>,
-    ) {
-      state.access_token = action.payload.access_token;
-    },
     setAuthType(state: IInitialState, action: PayloadAction<ISetAuthType>) {
       state.auth_type = action.payload.auth_type;
     },
   },
 });
 
-export const { setAccessToken, setAuthType } = auth_slice.actions;
+export const { setAuthType } = auth_slice.actions;
 export const auth_reducer = auth_slice.reducer;

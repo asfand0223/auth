@@ -1,6 +1,7 @@
 ﻿using Auth.Configuration;
 using Auth.Database;
-using Auth.Interfaces;
+using Auth.Interfaces.Repositories;
+using Auth.Interfaces.Services;
 using Auth.Repositories;
 using Auth.Services;
 using Microsoft.EntityFrameworkCore;

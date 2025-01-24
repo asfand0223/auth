@@ -1,45 +1,23 @@
+using Auth.Configuration;
 using Auth.DTOs;
-using Auth.Interfaces;
-using Auth.Results;
-using Auth.Utils;
+using Auth.Entities;
+using Auth.Entities.Results;
+using Auth.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace Auth.Controllers
 {
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthenticationService _authService;
+        private readonly IOptions<Config> _c;
+        private readonly IAuthenticationService _authenticationService;
 
-        public AuthController(IAuthenticationService authService)
+        public AuthController(IOptions<Config> c, IAuthenticationService authenticationService)
         {
-            _authService = authService;
-        }
-
-        [HttpPost("/login")]
-        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                AuthenticationResult result = await _authService.Login(loginDTO);
-                string json = await Json.Write<AuthenticationResult>(result);
-                if (!string.IsNullOrWhiteSpace(result.Error))
-                {
-                    return Unauthorized(json);
-                }
-
-                return Ok(json);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("AuthController - Login: " + ex);
-                return StatusCode(500, "Failed to login");
-            }
+            _c = c;
+            _authenticationService = authenticationService;
         }
 
         [HttpPost("/register")]
@@ -52,19 +30,69 @@ namespace Auth.Controllers
                     return BadRequest(ModelState);
                 }
 
-                AuthenticationResult result = await _authService.Register(registerDTO);
-                string json = await Json.Write<AuthenticationResult>(result);
+                RegisterResult result = await _authenticationService.Register(registerDTO);
+
                 if (!string.IsNullOrWhiteSpace(result.Error))
                 {
-                    return BadRequest(json);
+                    return Unauthorized(new APIError { Error = result.Error });
+                }
+                if (result.AccessToken == null)
+                {
+                    throw new Exception("Failed to generate access token");
                 }
 
-                return Ok(json);
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = DateTime.Now.AddMinutes(_c.Value.Jwt.Expires.TotalMinutes),
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                };
+                Response.Cookies.Append("access_token", result.AccessToken, cookieOptions);
+                return Ok();
             }
             catch (Exception ex)
             {
                 Console.WriteLine("UserController - Register: " + ex);
-                return StatusCode(500, "Failed to register user");
+                return StatusCode(500, new APIError { Error = "Failed to create account" });
+            }
+        }
+
+        [HttpPost("/login")]
+        public IActionResult Login([FromBody] LoginDTO loginDTO)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                LoginResult result = _authenticationService.Login(loginDTO);
+
+                if (!string.IsNullOrWhiteSpace(result.Error))
+                {
+                    return Unauthorized(new APIError { Error = result.Error });
+                }
+                if (result.AccessToken == null)
+                {
+                    throw new Exception("Failed to generate access token");
+                }
+
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = DateTime.Now.AddMinutes(_c.Value.Jwt.Expires.TotalMinutes),
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                };
+                Response.Cookies.Append("access_token", result.AccessToken, cookieOptions);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("AuthController - Login: " + ex);
+                return StatusCode(500, new APIError { Error = "Failed to login" });
             }
         }
     }

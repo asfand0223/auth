@@ -1,60 +1,68 @@
 using Auth.DTOs;
-using Auth.Interfaces;
+using Auth.Entities.Results;
+using Auth.Interfaces.Services;
 using Auth.Models;
-using Auth.Results;
-using Auth.Utils;
 
 namespace Auth.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly IAuthenticationValidationService _avs;
-        private readonly IUserService _us;
-        private readonly IAccessTokenService _ats;
+        private readonly IAuthenticationValidationService _authenticationValidationService;
+        private readonly IUserService _userService;
+        private readonly IAccessTokenService _acessTokenService;
 
         public AuthenticationService(
-            IAuthenticationValidationService avs,
-            IUserService us,
-            IAccessTokenService ats
+            IAuthenticationValidationService authenticationValidationService,
+            IUserService userService,
+            IAccessTokenService accessTokenService
         )
         {
-            _avs = avs;
-            _us = us;
-            _ats = ats;
+            _authenticationValidationService = authenticationValidationService;
+            _userService = userService;
+            _acessTokenService = accessTokenService;
         }
 
-        public async Task<AuthenticationResult> Register(RegisterDTO dto)
+        public async Task<RegisterResult> Register(RegisterDTO dto)
         {
-            AuthenticationValidationResult atvr = _avs.ValidateRegister(dto);
-            if (atvr.Error != null)
+            RegisterResult result = new RegisterResult { AccessToken = null, Error = null };
+            ValidateRegisterResult validateRegisterResult =
+                _authenticationValidationService.ValidateRegister(dto);
+            if (validateRegisterResult.Error != null)
             {
-                return new AuthenticationResult { Error = atvr.Error };
+                result.Error = validateRegisterResult.Error;
+                return result;
             }
 
-            Guid? id = await _us.Create(dto.Username, dto.Password);
+            Guid? id = await _userService.Create(dto.Username, dto.Password);
             if (id == null)
             {
-                return new AuthenticationResult { Error = "Failed to create user" };
+                result.Error = "Failed to create user";
+                return result;
             }
 
-            string json = await Json.Write<RegisterResult>(
-                new RegisterResult { AccessToken = _ats.Generate(id.Value, dto.Username) }
-            );
-            return new AuthenticationResult { Data = json };
+            result.AccessToken = _acessTokenService.Generate(id.Value, dto.Username);
+            return result;
         }
 
-        public async Task<AuthenticationResult> Login(LoginDTO dto)
+        public LoginResult Login(LoginDTO dto)
         {
-            (AuthenticationValidationResult avr, User? u) result = _avs.ValidateLogin(dto);
-            if (result.avr.Error != null || result.u == null)
+            LoginResult result = new LoginResult { AccessToken = null, Error = null };
+            ValidateLoginResult validateLoginResult =
+                _authenticationValidationService.ValidateLogin(dto);
+            if (validateLoginResult.Error != null)
             {
-                return new AuthenticationResult { Error = result.avr.Error };
+                result.Error = validateLoginResult.Error;
+                return result;
             }
 
-            string json = await Json.Write<LoginResult>(
-                new LoginResult { AccessToken = _ats.Generate(result.u.Id, dto.Username) }
-            );
-            return new AuthenticationResult { Data = json };
+            User? user = _userService.GetByUsername(dto.Username);
+            if (user == null)
+            {
+                result.Error = "User not found";
+                return result;
+            }
+            result.AccessToken = _acessTokenService.Generate(user.Id, dto.Username);
+            return result;
         }
     }
 }

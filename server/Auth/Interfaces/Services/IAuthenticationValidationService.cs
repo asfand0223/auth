@@ -1,12 +1,11 @@
 using Auth.DTOs;
-using Auth.Models;
-using Auth.Results;
+using Auth.Entities.Results;
 
-namespace Auth.Interfaces
+namespace Auth.Interfaces.Services
 {
     public interface IAuthenticationValidationService
     {
-        public AuthenticationValidationResult ValidateRegister(RegisterDTO dto);
-        public (AuthenticationValidationResult avr, User? u) ValidateLogin(LoginDTO dto);
+        public ValidateRegisterResult ValidateRegister(RegisterDTO dto);
+        public ValidateLoginResult ValidateLogin(LoginDTO dto);
     }
 }

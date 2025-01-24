@@ -1,7 +1,8 @@
 using Auth.DTOs;
-using Auth.Interfaces;
+using Auth.Entities.Results;
+using Auth.Interfaces.Repositories;
+using Auth.Interfaces.Services;
 using Auth.Models;
-using Auth.Results;
 
 namespace Auth.Services
 {
@@ -14,40 +15,40 @@ namespace Auth.Services
             _userRepository = userRepository;
         }
 
-        public AuthenticationValidationResult ValidateRegister(RegisterDTO dto)
+        public ValidateRegisterResult ValidateRegister(RegisterDTO dto)
         {
+            ValidateRegisterResult result = new ValidateRegisterResult { Error = null };
             User? existingU = _userRepository.GetByUsername(dto.Username);
             if (existingU != null)
             {
-                return new AuthenticationValidationResult { Error = "Username taken" };
+                result.Error = "Username taken";
+                return result;
             }
 
             if (dto.Password != dto.ConfirmPassword)
             {
-                return new AuthenticationValidationResult { Error = "Passwords do not match" };
+                result.Error = "Passwords do not match";
+                return result;
             }
 
-            return new AuthenticationValidationResult { Error = null };
+            return result;
         }
 
-        public (AuthenticationValidationResult avr, User? u) ValidateLogin(LoginDTO dto)
+        public ValidateLoginResult ValidateLogin(LoginDTO dto)
         {
+            ValidateLoginResult result = new ValidateLoginResult { Error = null };
             User? existingU = _userRepository.GetByUsername(dto.Username);
             if (existingU == null)
             {
-                return (
-                    new AuthenticationValidationResult
-                    {
-                        Error = "Account with this username does not exist",
-                    },
-                    null
-                );
+                result.Error = "Account with this username does not exist";
+                return result;
             }
             if (dto.Password != existingU.Password)
             {
-                return (new AuthenticationValidationResult { Error = "Incorrect password" }, null);
+                result.Error = "Incorrect password";
+                return result;
             }
-            return (new AuthenticationValidationResult { Error = null }, existingU);
+            return result;
         }
     }
 }
