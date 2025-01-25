@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 
 namespace Auth.Controllers
 {
-    [Route("[controller]")]
+    [Route("auth")]
     public class AuthController : ControllerBase
     {
         private readonly IOptions<Config> _c;
@@ -26,7 +26,7 @@ namespace Auth.Controllers
             __authorisationService = authorisationService;
         }
 
-        [HttpGet("/self")]
+        [HttpGet("self")]
         public IActionResult Self()
         {
             try
@@ -56,7 +56,7 @@ namespace Auth.Controllers
             }
         }
 
-        [HttpPost("/register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
             try
@@ -94,7 +94,7 @@ namespace Auth.Controllers
             }
         }
 
-        [HttpPost("/login")]
+        [HttpPost("login")]
         public IActionResult Login([FromBody] LoginDTO loginDTO)
         {
             try
