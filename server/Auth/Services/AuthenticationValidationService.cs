@@ -1,8 +1,8 @@
 using Auth.DTOs;
-using Auth.Entities.Results;
 using Auth.Interfaces.Repositories;
 using Auth.Interfaces.Services;
 using Auth.Models;
+using Auth.Results;
 
 namespace Auth.Services
 {

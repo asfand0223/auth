@@ -1,5 +1,5 @@
 using Auth.DTOs;
-using Auth.Entities.Results;
+using Auth.Results;
 
 namespace Auth.Interfaces.Services
 {

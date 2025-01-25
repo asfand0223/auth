@@ -1,8 +1,8 @@
 using Auth.Configuration;
 using Auth.DTOs;
 using Auth.Entities;
-using Auth.Entities.Results;
 using Auth.Interfaces.Services;
+using Auth.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -13,11 +13,47 @@ namespace Auth.Controllers
     {
         private readonly IOptions<Config> _c;
         private readonly IAuthenticationService _authenticationService;
+        private readonly IAuthorisationService __authorisationService;
 
-        public AuthController(IOptions<Config> c, IAuthenticationService authenticationService)
+        public AuthController(
+            IOptions<Config> c,
+            IAuthenticationService authenticationService,
+            IAuthorisationService authorisationService
+        )
         {
             _c = c;
             _authenticationService = authenticationService;
+            __authorisationService = authorisationService;
+        }
+
+        [HttpGet("/self")]
+        public IActionResult Self()
+        {
+            try
+            {
+                string? access_token = Request.Cookies["access_token"];
+                if (string.IsNullOrWhiteSpace(access_token))
+                {
+                    return Unauthorized("Invalid access token");
+                }
+
+                AuthoriseResult authoriseResult = __authorisationService.Authorise(access_token);
+                if (!string.IsNullOrWhiteSpace(authoriseResult.Error))
+                {
+                    return Unauthorized(authoriseResult.Error);
+                }
+                if (authoriseResult.Self == null)
+                {
+                    throw new Exception();
+                }
+
+                return Ok(authoriseResult.Self);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("AuthController - Self: " + ex);
+                return StatusCode(500, new APIError { Error = "Failed to authorise" });
+            }
         }
 
         [HttpPost("/register")]
@@ -44,7 +80,7 @@ namespace Auth.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Expires = DateTime.Now.AddMinutes(_c.Value.Jwt.Expires.TotalMinutes),
+                    Expires = DateTime.Now.AddMinutes(_c.Value.Jwt.ExpiresIn.TotalMinutes),
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
                 };
@@ -53,7 +89,7 @@ namespace Auth.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("UserController - Register: " + ex);
+                Console.WriteLine("AuthController - Register: " + ex);
                 return StatusCode(500, new APIError { Error = "Failed to create account" });
             }
         }
@@ -72,7 +108,7 @@ namespace Auth.Controllers
 
                 if (!string.IsNullOrWhiteSpace(result.Error))
                 {
-                    return Unauthorized(new APIError { Error = result.Error });
+                    return BadRequest(new APIError { Error = result.Error });
                 }
                 if (result.AccessToken == null)
                 {
@@ -82,7 +118,7 @@ namespace Auth.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Expires = DateTime.Now.AddMinutes(_c.Value.Jwt.Expires.TotalMinutes),
+                    Expires = DateTime.Now.AddMinutes(_c.Value.Jwt.ExpiresIn.TotalMinutes),
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
                 };

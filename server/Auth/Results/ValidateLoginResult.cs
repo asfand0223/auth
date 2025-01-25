@@ -1,4 +1,4 @@
-namespace Auth.Entities.Results
+namespace Auth.Results
 {
     public class ValidateLoginResult
     {

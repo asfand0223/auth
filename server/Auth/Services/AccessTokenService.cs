@@ -1,10 +1,9 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using Auth.Configuration;
 using Auth.Interfaces.Services;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+using AR = Auth.Results;
+using U = Auth.Utils;
 
 namespace Auth.Services
 {
@@ -19,22 +18,27 @@ namespace Auth.Services
 
         public string Generate(Guid userId, string username)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_c.Value.Jwt.Key));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: _c.Value.Jwt.Issuer,
-                audience: _c.Value.Jwt.Audience,
-                claims: new List<Claim>
+            return U.Jwt.GenerateToken(
+                _c.Value.Jwt.Key,
+                _c.Value.Jwt.Issuer,
+                _c.Value.Jwt.Audience,
+                new List<Claim>
                 {
                     new Claim("user_id", $"{userId}"),
                     new Claim("username", $"{username}"),
                 },
-                expires: DateTime.Now.AddMinutes(_c.Value.Jwt.Expires.TotalSeconds),
-                signingCredentials: creds
+                _c.Value.Jwt.ExpiresIn.TotalSeconds
             );
+        }
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+        public AR.TokenValidationResult Validate(string access_token)
+        {
+            return U.Jwt.ValidateToken(
+                access_token,
+                _c.Value.Jwt.Key,
+                _c.Value.Jwt.Issuer,
+                _c.Value.Jwt.Audience
+            );
         }
     }
 }

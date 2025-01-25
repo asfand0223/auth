@@ -1,9 +1,8 @@
-namespace Auth.Entities.Results
+namespace Auth.Results
 {
-    public class AuthenticationValidationResult
+    public class RegisterResult
     {
         public string? AccessToken { get; set; }
-
         public string? Error { get; set; }
     }
 }
