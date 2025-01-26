@@ -1,23 +1,27 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export interface LoginValidationErrors {
+export interface ILoginValidationErrors {
   Username: Array<string>;
   Password: Array<string>;
+}
+
+export interface ILoginError {
+  message: string;
 }
 
 interface IInitialState {
   username: string;
   password: string;
-  error: string;
-  validation_errors: LoginValidationErrors | null;
+  error: ILoginError | null;
+  validation_errors: ILoginValidationErrors | null;
   is_submittable: boolean;
 }
 
 const initialState: IInitialState = {
   username: "",
   password: "",
-  error: "",
+  error: null,
   validation_errors: null,
   is_submittable: false,
 };
@@ -30,12 +34,12 @@ interface ISetPassword {
   password: string;
 }
 
-interface ISetError {
-  error: string;
+interface ISetLoginError {
+  error: ILoginError | null;
 }
 
 interface ISetValidationErrors {
-  validation_errors: LoginValidationErrors | null;
+  validation_errors: ILoginValidationErrors | null;
 }
 
 interface ISetIsSubmittable {
@@ -52,7 +56,7 @@ export const login_slice = createSlice({
     setPassword(state: IInitialState, action: PayloadAction<ISetPassword>) {
       state.password = action.payload.password;
     },
-    setError(state: IInitialState, action: PayloadAction<ISetError>) {
+    setError(state: IInitialState, action: PayloadAction<ISetLoginError>) {
       state.error = action.payload.error;
     },
     setValidationErrors(

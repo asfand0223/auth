@@ -7,12 +7,12 @@ namespace Auth.DTOs
     {
         [JsonPropertyName("username")]
         [JsonRequired]
-        [Required]
+        [Required(ErrorMessage = "Username is required")]
         public required string Username { get; set; }
 
         [JsonPropertyName("password")]
         [JsonRequired]
-        [Required]
+        [Required(ErrorMessage = "Password is required")]
         public required string Password { get; set; }
     }
 }

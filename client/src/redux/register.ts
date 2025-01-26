@@ -1,18 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export interface RegisterValidationErrors {
+export interface IRegisterValidationErrors {
   Username: Array<string>;
   Password: Array<string>;
   ConfirmPassword: Array<string>;
+}
+
+export interface IRegisterError {
+  message: string;
 }
 
 interface IInitialState {
   username: string;
   password: string;
   confirm_password: string;
-  error: string;
-  validation_errors: RegisterValidationErrors | null;
+  error: IRegisterError | null;
+  validation_errors: IRegisterValidationErrors | null;
   is_submittable: boolean;
 }
 
@@ -20,7 +24,7 @@ const initialState: IInitialState = {
   username: "",
   password: "",
   confirm_password: "",
-  error: "",
+  error: null,
   validation_errors: null,
   is_submittable: false,
 };
@@ -37,12 +41,12 @@ interface ISetConfirmPassword {
   confirm_password: string;
 }
 
-interface ISetError {
-  error: string;
+interface ISetRegisterError {
+  error: IRegisterError | null;
 }
 
 interface ISetValidationErrors {
-  validation_errors: RegisterValidationErrors | null;
+  validation_errors: IRegisterValidationErrors | null;
 }
 
 interface ISetIsSubmittable {
@@ -65,7 +69,7 @@ export const register_slice = createSlice({
     ) {
       state.confirm_password = action.payload.confirm_password;
     },
-    setError(state: IInitialState, action: PayloadAction<ISetError>) {
+    setError(state: IInitialState, action: PayloadAction<ISetRegisterError>) {
       state.error = action.payload.error;
     },
     setValidationErrors(

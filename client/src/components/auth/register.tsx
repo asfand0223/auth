@@ -1,13 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import styles from "@/styles/auth/register.module.scss";
 import { useDispatch } from "react-redux";
-import {
-  setUsername,
-  setPassword,
-  setConfirmPassword,
-  RegisterValidationErrors,
-} from "@/redux/register";
-import { register, IRegisterResponse } from "@/api/auth";
+import { setUsername, setPassword, setConfirmPassword } from "@/redux/register";
+import { register } from "@/api/auth";
 import {
   setError,
   setValidationErrors,
@@ -33,7 +28,7 @@ const Register = () => {
   const confirm_password_ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    dispatch(setError({ error: "" }));
+    dispatch(setError({ error: null }));
     dispatch(setValidationErrors({ validation_errors: null }));
   }, []);
 
@@ -70,7 +65,7 @@ const Register = () => {
     try {
       e.preventDefault();
       e.stopPropagation();
-      dispatch(setError({ error: "" }));
+      dispatch(setError({ error: null }));
       dispatch(setValidationErrors({ validation_errors: null }));
       if (
         !username_ref.current ||
@@ -86,15 +81,14 @@ const Register = () => {
       });
       if (response.status === 200) {
         console.log("Registered");
-      } else if (response.data.hasOwnProperty("error")) {
-        const rr: IRegisterResponse = response.data;
-        dispatch(setError({ error: rr.error }));
+      } else if (response.error) {
+        dispatch(setError({ error: { message: response.error } }));
       } else {
-        const validation_errors_json_string = JSON.stringify(response.data);
-        const validation_errors: RegisterValidationErrors = JSON.parse(
-          validation_errors_json_string,
+        dispatch(
+          setValidationErrors({
+            validation_errors: response.validation_errors,
+          }),
         );
-        dispatch(setValidationErrors({ validation_errors }));
       }
     } catch (e) {
       console.error(e);
@@ -103,7 +97,7 @@ const Register = () => {
 
   return (
     <div className={styles.container}>
-      {error && <Error error={error} />}
+      {error && <Error error={error.message} />}
       <form className={styles.form} onSubmit={(e) => handleFormSubmit(e)}>
         <div className={styles.form_control}>
           <label>

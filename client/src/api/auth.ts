@@ -1,4 +1,6 @@
-import axios, { AxiosResponse } from "axios";
+import { ILoginValidationErrors } from "@/redux/login";
+import { IRegisterValidationErrors } from "@/redux/register";
+import axios from "axios";
 
 interface ILoginParams {
   username: string;
@@ -6,13 +8,15 @@ interface ILoginParams {
 }
 
 export interface ILoginResponse {
-  error: string;
+  validation_errors: ILoginValidationErrors | null;
+  error: string | null;
+  status: number;
 }
 
 export const login = async ({
   username,
   password,
-}: ILoginParams): Promise<AxiosResponse<any, any>> => {
+}: ILoginParams): Promise<ILoginResponse> => {
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_AUTH_URL as string}/login`,
     {
@@ -21,7 +25,14 @@ export const login = async ({
     },
     { validateStatus: () => true, withCredentials: true },
   );
-  return response;
+  var res = { validation_errors: null, error: null, status: response.status };
+  if (response.status == 200) return res;
+  if (response.data.hasOwnProperty("error")) {
+    res.error = response.data.error;
+  } else {
+    res.validation_errors = response.data;
+  }
+  return res;
 };
 
 interface IRegisterParams {
@@ -31,14 +42,16 @@ interface IRegisterParams {
 }
 
 export interface IRegisterResponse {
-  error: string;
+  validation_errors: IRegisterValidationErrors | null;
+  error: string | null;
+  status: number;
 }
 
 export const register = async ({
   username,
   password,
   confirm_password,
-}: IRegisterParams): Promise<AxiosResponse<any, any>> => {
+}: IRegisterParams): Promise<IRegisterResponse> => {
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_AUTH_URL as string}/register`,
     {
@@ -48,6 +61,12 @@ export const register = async ({
     },
     { validateStatus: () => true, withCredentials: true },
   );
-
-  return response;
+  var res = { validation_errors: null, error: null, status: response.status };
+  if (response.status == 200) return res;
+  if (response.data.hasOwnProperty("error")) {
+    res.error = response.data.error;
+  } else {
+    res.validation_errors = response.data;
+  }
+  return res;
 };

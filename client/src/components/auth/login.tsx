@@ -2,14 +2,13 @@ import React, { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import styles from "@/styles/auth/login.module.scss";
 import {
-  LoginValidationErrors,
   setError,
   setIsSubmittable,
   setPassword,
   setUsername,
   setValidationErrors,
 } from "@/redux/login";
-import { login, ILoginResponse } from "@/api/auth";
+import { login } from "@/api/auth";
 import Error from "./error";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -23,7 +22,7 @@ const Login = () => {
   const password_ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    dispatch(setError({ error: "" }));
+    dispatch(setError({ error: null }));
     dispatch(setValidationErrors({ validation_errors: null }));
   }, []);
 
@@ -45,7 +44,7 @@ const Login = () => {
     try {
       e.preventDefault();
       e.stopPropagation();
-      dispatch(setError({ error: "" }));
+      dispatch(setError({ error: null }));
       dispatch(setValidationErrors({ validation_errors: null }));
       if (!username_ref.current || !password_ref.current) return;
       const response = await login({
@@ -53,16 +52,15 @@ const Login = () => {
         password: password_ref.current.value,
       });
       if (response.status === 200) {
-        console.log("Logged In");
-      } else if (response.data.hasOwnProperty("error")) {
-        const lr: ILoginResponse = response.data;
-        dispatch(setError({ error: lr.error }));
+        console.log("Logged in!");
+      } else if (response.error) {
+        dispatch(setError({ error: { message: response.error } }));
       } else {
-        const validation_errors_json_string = JSON.stringify(response.data);
-        const validation_errors: LoginValidationErrors = JSON.parse(
-          validation_errors_json_string,
+        dispatch(
+          setValidationErrors({
+            validation_errors: response.validation_errors,
+          }),
         );
-        dispatch(setValidationErrors({ validation_errors }));
       }
     } catch (e) {
       console.error(e);
@@ -71,7 +69,7 @@ const Login = () => {
 
   return (
     <div className={styles.container}>
-      {error && <Error error={error} />}
+      {error && <Error error={error.message} />}
       <form className={styles.form} onSubmit={(e) => handleSubmit(e)}>
         <div className={styles.form_control}>
           <label>

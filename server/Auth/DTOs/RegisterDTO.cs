@@ -7,19 +7,19 @@ namespace Auth.DTOs
     {
         [JsonPropertyName("username")]
         [JsonRequired]
-        [Required]
+        [Required(ErrorMessage = "Username is required")]
         public required string Username { get; set; }
 
         [JsonRequired]
         [JsonPropertyName("password")]
-        [Required]
-        [MinLength(4)]
+        [Required(ErrorMessage = "Password is required")]
+        [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
         public required string Password { get; set; }
 
         [JsonRequired]
         [JsonPropertyName("confirm_password")]
-        [Required]
-        [MinLength(4)]
+        [Required(ErrorMessage = "Confirm Password is required")]
+        [MinLength(8, ErrorMessage = "Confirm Password must be at least 8 characters")]
         public required string ConfirmPassword { get; set; }
     }
 }
