@@ -1,7 +1,4 @@
 "use client";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
-import Welcome from "@/components/auth/welcome";
 import styles from "./page.module.scss";
 import Auth from "@/components/auth/auth";
 import { useEffect } from "react";
@@ -10,7 +7,6 @@ import { setSelf } from "@/redux/auth";
 import { useDispatch } from "react-redux";
 
 const Home = () => {
-  const { self } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   useEffect(() => {
     const getSelf = async () => {
@@ -21,8 +17,7 @@ const Home = () => {
   }, []);
   return (
     <div className={styles.container}>
-      {self && <Welcome />}
-      {!self && <Auth />}
+      <Auth />
     </div>
   );
 };

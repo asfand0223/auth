@@ -6,17 +6,16 @@ import { AuthType } from "@/redux/auth";
 import { RootState } from "@/redux/store";
 import AuthControl from "./auth_control";
 import styles from "@/styles/auth/auth.module.scss";
+import Welcome from "./welcome";
 
 const Auth = () => {
-  const { access_token, auth_type } = useSelector(
-    (state: RootState) => state.auth,
-  );
+  const { self, auth_type } = useSelector((state: RootState) => state.auth);
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
-        <AuthControl />
-        {!access_token &&
-          (auth_type === AuthType.Register ? <Register /> : <Login />)}
+        {self && <Welcome />}
+        {!self && <AuthControl />}
+        {!self && (auth_type === AuthType.Register ? <Register /> : <Login />)}
       </div>
     </div>
   );
