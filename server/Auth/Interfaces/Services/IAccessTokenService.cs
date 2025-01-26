@@ -4,7 +4,7 @@ namespace Auth.Interfaces.Services
 {
     public interface IAccessTokenService
     {
-        public string Generate(Guid userId, string username);
+        public string? Generate(Guid userId, string username);
         public AR.TokenValidationResult Validate(string access_token);
     }
 }

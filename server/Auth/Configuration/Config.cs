@@ -18,6 +18,7 @@ namespace Auth.Configuration
         public required string Issuer { get; set; }
         public required string Audience { get; set; }
         public TimeSpan ExpiresIn { get; set; }
+        public TimeSpan HttpOnlyCookieExpiresIn { get; set; }
     }
 
     public class KestrelSettings

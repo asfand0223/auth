@@ -20,9 +20,13 @@ namespace Auth.Services
             _selfService = selfService;
         }
 
-        public string Generate(Guid userId, string username)
+        public string? Generate(Guid userId, string username)
         {
-            Self self = _selfService.Generate(userId, username);
+            Self? self = _selfService.CreateSelf(userId, username);
+            if (self == null)
+            {
+                return null;
+            }
             string selfJson = JsonSerializer.Serialize<Self>(self);
             return U.Jwt.Generate(
                 _c.Value.Jwt.Key,

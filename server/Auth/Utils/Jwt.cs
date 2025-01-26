@@ -51,35 +51,17 @@ namespace Auth.Utils
                         ),
                         ClockSkew = TimeSpan.Zero,
                     },
-                    out var accessToken
+                    out var _
                 );
-                return new AR.TokenValidationResult
-                {
-                    AccessToken = token,
-                    Claims = claimsPrincipal.Claims.ToList(),
-                    Valid = true,
-                    Expired = false,
-                };
+                return new AR.TokenValidationResult { Valid = true, Expired = false };
             }
             catch (SecurityTokenExpiredException)
             {
-                return new AR.TokenValidationResult
-                {
-                    AccessToken = null,
-                    Claims = new List<Claim>(),
-                    Valid = false,
-                    Expired = true,
-                };
+                return new AR.TokenValidationResult { Valid = true, Expired = true };
             }
             catch (SecurityTokenValidationException)
             {
-                return new AR.TokenValidationResult
-                {
-                    AccessToken = null,
-                    Claims = new List<Claim>(),
-                    Valid = false,
-                    Expired = false,
-                };
+                return new AR.TokenValidationResult { Valid = false, Expired = false };
             }
         }
     }

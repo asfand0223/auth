@@ -1,3 +1,4 @@
+using Auth.Entities;
 using Auth.Models;
 
 namespace Auth.Interfaces.Services
@@ -6,5 +7,6 @@ namespace Auth.Interfaces.Services
     {
         public RefreshToken? GetByUserId(Guid userId);
         public Task<Guid?> Create(Guid userId);
+        public string? RefreshAccessToken(Self self);
     }
 }

@@ -57,7 +57,9 @@ namespace Auth.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Expires = DateTime.UtcNow.AddSeconds(_c.Value.Jwt.ExpiresIn.TotalSeconds),
+                    Expires = DateTime.UtcNow.AddSeconds(
+                        _c.Value.Jwt.HttpOnlyCookieExpiresIn.TotalSeconds
+                    ),
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
                 };
@@ -95,7 +97,9 @@ namespace Auth.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Expires = DateTime.UtcNow.AddSeconds(_c.Value.Jwt.ExpiresIn.TotalSeconds),
+                    Expires = DateTime.UtcNow.AddSeconds(
+                        _c.Value.Jwt.HttpOnlyCookieExpiresIn.TotalSeconds
+                    ),
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
                 };
@@ -134,7 +138,9 @@ namespace Auth.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Expires = DateTime.UtcNow.AddMinutes(_c.Value.Jwt.ExpiresIn.TotalMinutes),
+                    Expires = DateTime.UtcNow.AddMinutes(
+                        _c.Value.Jwt.HttpOnlyCookieExpiresIn.TotalMinutes
+                    ),
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
                 };

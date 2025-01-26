@@ -34,7 +34,7 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IAuthenticationValidationService, AuthenticationValidationService>();
-builder.Services.AddScoped<IAuthorisationService, AuthorisationServcie>();
+builder.Services.AddScoped<IAuthorisationService, AuthorisationService>();
 builder.Services.AddScoped<IAccessTokenService, AccessTokenService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<ISelfService, SelfService>();

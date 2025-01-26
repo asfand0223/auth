@@ -1,64 +1,70 @@
-using System.Security.Claims;
-using System.Text.Json;
+using Auth.Configuration;
 using Auth.Entities;
+using Auth.Entities.Results;
 using Auth.Interfaces.Services;
+using Auth.Models;
 using Auth.Results;
+using Microsoft.Extensions.Options;
 using AR = Auth.Results;
 
 namespace Auth.Services
 {
-    public class AuthorisationServcie : IAuthorisationService
+    public class AuthorisationService : IAuthorisationService
     {
+        private readonly IOptions<Config> _config;
         private readonly IAccessTokenService _accessTokenService;
+        private readonly ISelfService _selfService;
+        private readonly IRefreshTokenService _refreshTokenService;
 
-        public AuthorisationServcie(IAccessTokenService accessTokenService)
+        public AuthorisationService(
+            IOptions<Config> config,
+            IAccessTokenService accessTokenService,
+            ISelfService selfService,
+            IRefreshTokenService refreshTokenService
+        )
         {
+            _config = config;
             _accessTokenService = accessTokenService;
+            _selfService = selfService;
+            _refreshTokenService = refreshTokenService;
         }
 
         public AuthoriseResult Authorise(string access_token)
         {
             // Prepare result object to return
             AR.AuthoriseResult result = new AuthoriseResult { };
+            string authorisedAccessToken = access_token;
             // Validate access token
             AR.TokenValidationResult tokenValidationResult = _accessTokenService.Validate(
                 access_token
             );
-            if (!tokenValidationResult.Valid && !tokenValidationResult.Expired)
+            if (!tokenValidationResult.Valid)
             {
                 result.Error = "Failed to validate access token";
                 return result;
             }
-            if (!tokenValidationResult.Valid && tokenValidationResult.Expired)
+            // Access token valid - Validate self
+            SelfResult selfResult = _selfService.GetSelf(access_token);
+            if (selfResult.Self == null)
             {
-                result.Error = "Access token expired";
+                result.Error = "Invalid self";
                 return result;
             }
-            if (tokenValidationResult.Claims == null)
+            Self self = selfResult.Self;
+            //Refresh token if expired
+            if (tokenValidationResult.Valid && tokenValidationResult.Expired)
             {
-                result.Error = "No claims found";
-                return result;
-            }
-            // Token is valid - get self
-            List<Claim> claims = tokenValidationResult.Claims;
-            string? selfJson = claims
-                .Where(c => c.Type == "self")
-                .Select(c => c.Value)
-                .FirstOrDefault();
-            if (selfJson == null)
-            {
-                result.Error = "Failed to find self claim";
-                return result;
-            }
-            Self? self = JsonSerializer.Deserialize<Self>(selfJson);
-            if (self == null)
-            {
-                result.Error = "Failed to deserialise self";
-                return result;
+                string? refreshedAccessToken = _refreshTokenService.RefreshAccessToken(self);
+                if (string.IsNullOrWhiteSpace(refreshedAccessToken))
+                {
+                    result.Error = "Failed to refresh access token";
+                    return result;
+                }
+                authorisedAccessToken = refreshedAccessToken;
             }
 
-            result.AccessToken = tokenValidationResult.AccessToken;
-            result.Self = self;
+            result.AccessToken = authorisedAccessToken;
+            result.Self = selfResult.Self;
             return result;
         }
     }

@@ -36,7 +36,7 @@ namespace Auth.Repositories
                 {
                     Id = Guid.NewGuid(),
                     UserId = userId,
-                    ExpiresAt = DateTime.UtcNow,
+                    ExpiresAt = DateTime.UtcNow.AddDays(1),
                 };
                 await _context.AddAsync(rt);
                 await _context.SaveChangesAsync();
