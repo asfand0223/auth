@@ -13,9 +13,9 @@ namespace Auth.Services
             _userRepository = userRepository;
         }
 
-        public User? GetByUsername(string username)
+        public async Task<User?> GetByUsername(string username)
         {
-            return _userRepository.GetByUsername(username);
+            return await _userRepository.GetByUsername(username);
         }
 
         public async Task<Guid?> Create(string username, string password)

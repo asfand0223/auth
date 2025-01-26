@@ -31,7 +31,7 @@ namespace Auth.Services
             RegisterResult result = new RegisterResult { };
             // Validate registration details
             ValidateRegisterResult validateRegisterResult =
-                _authenticationValidationService.ValidateRegister(dto);
+                await _authenticationValidationService.ValidateRegister(dto);
             if (validateRegisterResult.Error != null)
             {
                 result.Error = validateRegisterResult.Error;
@@ -62,14 +62,14 @@ namespace Auth.Services
             LoginResult result = new LoginResult { };
             // Validate login details
             ValidateLoginResult validateLoginResult =
-                _authenticationValidationService.ValidateLogin(dto);
+                await _authenticationValidationService.ValidateLogin(dto);
             if (validateLoginResult.Error != null)
             {
                 result.Error = validateLoginResult.Error;
                 return result;
             }
             // Details validated - get user for access token claims construction
-            User? user = _userService.GetByUsername(dto.Username);
+            User? user = await _userService.GetByUsername(dto.Username);
             if (user == null)
             {
                 result.Error = "User not found";

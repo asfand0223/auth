@@ -1,6 +1,7 @@
 using Auth.Database;
 using Auth.Interfaces.Repositories;
 using Auth.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Repositories
 {
@@ -13,11 +14,11 @@ namespace Auth.Repositories
             _context = context;
         }
 
-        public User? GetByUsername(string username)
+        public async Task<User?> GetByUsername(string username)
         {
             try
             {
-                return _context.Users.FirstOrDefault((User u) => u.Username == username);
+                return await _context.Users.FirstOrDefaultAsync((User u) => u.Username == username);
             }
             catch (Exception ex)
             {

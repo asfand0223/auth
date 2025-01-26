@@ -5,7 +5,7 @@ namespace Auth.Interfaces.Services
 {
     public interface IAuthenticationValidationService
     {
-        public ValidateRegisterResult ValidateRegister(RegisterDTO dto);
-        public ValidateLoginResult ValidateLogin(LoginDTO dto);
+        public Task<ValidateRegisterResult> ValidateRegister(RegisterDTO dto);
+        public Task<ValidateLoginResult> ValidateLogin(LoginDTO dto);
     }
 }

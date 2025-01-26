@@ -15,11 +15,11 @@ namespace Auth.Services
             _userRepository = userRepository;
         }
 
-        public ValidateRegisterResult ValidateRegister(RegisterDTO dto)
+        public async Task<ValidateRegisterResult> ValidateRegister(RegisterDTO dto)
         {
             ValidateRegisterResult result = new ValidateRegisterResult { };
 
-            User? existingU = _userRepository.GetByUsername(dto.Username);
+            User? existingU = await _userRepository.GetByUsername(dto.Username);
             if (existingU != null)
             {
                 result.Error = "Username taken";
@@ -34,11 +34,11 @@ namespace Auth.Services
             return result;
         }
 
-        public ValidateLoginResult ValidateLogin(LoginDTO dto)
+        public async Task<ValidateLoginResult> ValidateLogin(LoginDTO dto)
         {
             ValidateLoginResult result = new ValidateLoginResult { };
 
-            User? existingU = _userRepository.GetByUsername(dto.Username);
+            User? existingU = await _userRepository.GetByUsername(dto.Username);
             if (existingU == null)
             {
                 result.Error = "Account with this username does not exist";

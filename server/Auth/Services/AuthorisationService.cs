@@ -2,7 +2,6 @@ using Auth.Configuration;
 using Auth.Entities;
 using Auth.Entities.Results;
 using Auth.Interfaces.Services;
-using Auth.Models;
 using Auth.Results;
 using Microsoft.Extensions.Options;
 using AR = Auth.Results;
@@ -29,7 +28,7 @@ namespace Auth.Services
             _refreshTokenService = refreshTokenService;
         }
 
-        public AuthoriseResult Authorise(string access_token)
+        public async Task<AuthoriseResult> Authorise(string access_token)
         {
             // Prepare result object to return
             AR.AuthoriseResult result = new AuthoriseResult { };
@@ -54,7 +53,7 @@ namespace Auth.Services
             //Refresh token if expired
             if (tokenValidationResult.Valid && tokenValidationResult.Expired)
             {
-                string? refreshedAccessToken = _refreshTokenService.RefreshAccessToken(self);
+                string? refreshedAccessToken = await _refreshTokenService.RefreshAccessToken(self);
                 if (string.IsNullOrWhiteSpace(refreshedAccessToken))
                 {
                     result.Error = "Failed to refresh access token";

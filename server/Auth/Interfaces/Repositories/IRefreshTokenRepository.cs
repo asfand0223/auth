@@ -4,7 +4,8 @@ namespace Auth.Interfaces.Repositories
 {
     public interface IRefreshTokenRepository
     {
-        public RefreshToken? GetByUserId(Guid userId);
+        public Task<RefreshToken?> GetByUserId(Guid userId);
         public Task<Guid?> Create(Guid userId);
+        public Task<bool> Delete(Guid id);
     }
 }

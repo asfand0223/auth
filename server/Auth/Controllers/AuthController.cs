@@ -27,7 +27,7 @@ namespace Auth.Controllers
         }
 
         [HttpGet("self")]
-        public IActionResult Self()
+        public async Task<IActionResult> Self()
         {
             try
             {
@@ -39,7 +39,9 @@ namespace Auth.Controllers
                     return Unauthorized(new APIError { Error = "No access token found" });
                 }
                 // Check if user is authorised
-                AuthoriseResult authoriseResult = __authorisationService.Authorise(access_token);
+                AuthoriseResult authoriseResult = await __authorisationService.Authorise(
+                    access_token
+                );
                 if (!string.IsNullOrWhiteSpace(authoriseResult.Error))
                 {
                     return Unauthorized(new APIError { Error = authoriseResult.Error });

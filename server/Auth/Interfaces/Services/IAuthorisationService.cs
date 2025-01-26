@@ -4,6 +4,6 @@ namespace Auth.Interfaces.Services
 {
     public interface IAuthorisationService
     {
-        public AuthoriseResult Authorise(string access_token);
+        public Task<AuthoriseResult> Authorise(string access_token);
     }
 }

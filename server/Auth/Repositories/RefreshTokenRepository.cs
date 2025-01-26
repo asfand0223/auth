@@ -1,6 +1,7 @@
 using Auth.Database;
 using Auth.Interfaces.Repositories;
 using Auth.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Repositories
 {
@@ -13,11 +14,11 @@ namespace Auth.Repositories
             _context = context;
         }
 
-        public RefreshToken? GetByUserId(Guid userId)
+        public async Task<RefreshToken?> GetByUserId(Guid userId)
         {
             try
             {
-                return _context.RefreshTokens.FirstOrDefault(
+                return await _context.RefreshTokens.FirstOrDefaultAsync(
                     (RefreshToken rt) => rt.UserId == userId
                 );
             }
@@ -46,6 +47,22 @@ namespace Auth.Repositories
             {
                 Console.WriteLine("RefreshTokenRepository - Create: " + ex);
                 return null;
+            }
+        }
+
+        public async Task<bool> Delete(Guid id)
+        {
+            try
+            {
+                await _context
+                    .RefreshTokens.Where((RefreshToken rt) => rt.Id == id)
+                    .ExecuteDeleteAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("RefreshTokenRepository - Delete: " + ex);
+                return false;
             }
         }
     }

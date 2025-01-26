@@ -5,8 +5,8 @@ namespace Auth.Interfaces.Services
 {
     public interface IRefreshTokenService
     {
-        public RefreshToken? GetByUserId(Guid userId);
+        public Task<RefreshToken?> GetByUserId(Guid userId);
         public Task<Guid?> Create(Guid userId);
-        public string? RefreshAccessToken(Self self);
+        public Task<string?> RefreshAccessToken(Self self);
     }
 }

@@ -24,9 +24,9 @@ namespace Auth.Services
             _accessTokenService = accessTokenService;
         }
 
-        public RefreshToken? GetByUserId(Guid userId)
+        public async Task<RefreshToken?> GetByUserId(Guid userId)
         {
-            return _refreshTokenRepository.GetByUserId(userId);
+            return await _refreshTokenRepository.GetByUserId(userId);
         }
 
         public async Task<Guid?> Create(Guid userId)
@@ -34,20 +34,26 @@ namespace Auth.Services
             return await _refreshTokenRepository.Create(userId);
         }
 
-        public string? RefreshAccessToken(Self self)
+        public async Task<string?> RefreshAccessToken(Self self)
         {
-            RefreshToken? refreshToken = _refreshTokenRepository.GetByUserId(self.UserId);
+            // Get refresh token from db and validate
+            RefreshToken? refreshToken = await _refreshTokenRepository.GetByUserId(self.UserId);
             if (refreshToken == null)
             {
                 return null;
             }
-            bool refreshTokenIsExpired =
-                DateTime.UtcNow.Subtract(refreshToken.ExpiresAt).TotalSeconds
-                >= _config.Value.Jwt.ExpiresIn.TotalSeconds;
-            if (refreshTokenIsExpired)
+            if (DateTime.UtcNow > refreshToken.ExpiresAt)
             {
                 return null;
             }
+            // Refresh token(single-use) rotation
+            bool refreshTokenDeleted = await _refreshTokenRepository.Delete(refreshToken.Id);
+            if (!refreshTokenDeleted)
+            {
+                return null;
+            }
+            await _refreshTokenRepository.Create(self.UserId);
+
             return _accessTokenService.Generate(self.UserId, self.Username);
         }
     }
