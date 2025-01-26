@@ -18,12 +18,11 @@ namespace Auth.Utils
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret_key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
             var token = new JwtSecurityToken(
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(expiresIn),
+                expires: DateTime.UtcNow.AddSeconds(expiresIn),
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -50,8 +49,9 @@ namespace Auth.Utils
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(secret_key)
                         ),
+                        ClockSkew = TimeSpan.Zero,
                     },
-                    out var _
+                    out var accessToken
                 );
                 return new AR.TokenValidationResult
                 {

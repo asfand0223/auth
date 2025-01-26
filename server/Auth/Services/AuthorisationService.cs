@@ -35,6 +35,7 @@ namespace Auth.Services
             }
             if (tokenValidationResult.Claims == null)
             {
+                result.Error = "No claims found";
                 return result;
             }
 

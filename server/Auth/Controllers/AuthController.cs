@@ -32,15 +32,16 @@ namespace Auth.Controllers
             try
             {
                 string? access_token = Request.Cookies["access_token"];
+                Response.Cookies.Delete("access_token");
                 if (string.IsNullOrWhiteSpace(access_token))
                 {
-                    return Unauthorized("Invalid access token");
+                    return Unauthorized(new APIError { Error = "No access token found" });
                 }
 
                 AuthoriseResult authoriseResult = __authorisationService.Authorise(access_token);
                 if (!string.IsNullOrWhiteSpace(authoriseResult.Error))
                 {
-                    return Unauthorized(authoriseResult.Error);
+                    return Unauthorized(new APIError { Error = authoriseResult.Error });
                 }
                 if (string.IsNullOrWhiteSpace(authoriseResult.AccessToken))
                 {
@@ -54,7 +55,7 @@ namespace Auth.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Expires = DateTime.Now.AddMinutes(_c.Value.Jwt.ExpiresIn.TotalMinutes),
+                    Expires = DateTime.UtcNow.AddMinutes(_c.Value.Jwt.ExpiresIn.TotalMinutes),
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
                 };
@@ -92,7 +93,7 @@ namespace Auth.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Expires = DateTime.Now.AddMinutes(_c.Value.Jwt.ExpiresIn.TotalMinutes),
+                    Expires = DateTime.UtcNow.AddMinutes(_c.Value.Jwt.ExpiresIn.TotalMinutes),
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
                 };
@@ -130,7 +131,7 @@ namespace Auth.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Expires = DateTime.Now.AddMinutes(_c.Value.Jwt.ExpiresIn.TotalMinutes),
+                    Expires = DateTime.UtcNow.AddMinutes(_c.Value.Jwt.ExpiresIn.TotalMinutes),
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
                 };

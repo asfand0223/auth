@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import styles from "@/styles/auth/register.module.scss";
 import { useDispatch } from "react-redux";
 import { setUsername, setPassword, setConfirmPassword } from "@/redux/register";
-import { register, self } from "@/api/auth";
+import { register, authorise } from "@/api/auth";
 import {
   setError,
   setValidationErrors,
@@ -81,7 +81,7 @@ const Register = () => {
         confirm_password: confirm_password_ref.current.value,
       });
       if (response.status === 200) {
-        const response = await self();
+        const response = await authorise();
         dispatch(setSelf({ self: response }));
       } else if (response.error) {
         dispatch(setError({ error: { message: response.error } }));

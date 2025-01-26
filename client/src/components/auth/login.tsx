@@ -13,7 +13,7 @@ import Error from "./error";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import ValidationErrors from "./validation_errors";
-import { self } from "@/api/auth";
+import { authorise } from "@/api/auth";
 import { setSelf } from "@/redux/auth";
 
 const Login = () => {
@@ -54,7 +54,7 @@ const Login = () => {
         password: password_ref.current.value,
       });
       if (response.status === 200) {
-        const response = await self();
+        const response = await authorise();
         dispatch(setSelf({ self: response }));
       } else if (response.error) {
         dispatch(setError({ error: { message: response.error } }));

@@ -76,7 +76,7 @@ export interface ISelf {
   username: string;
 }
 
-export const self = async (): Promise<ISelf | null> => {
+export const authorise = async (): Promise<ISelf | null> => {
   const response = await axios.get(
     `${process.env.NEXT_PUBLIC_AUTH_URL as string}/self`,
     { validateStatus: () => true, withCredentials: true },
