@@ -1,3 +1,4 @@
+import { ISelf } from "@/api/auth";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -7,17 +8,21 @@ export enum AuthType {
 }
 
 interface IInitialState {
-  access_token: string | null;
   auth_type: AuthType;
+  self: ISelf | null;
 }
 
 const initialState: IInitialState = {
-  access_token: null,
   auth_type: AuthType.Login,
+  self: null,
 };
 
 interface ISetAuthType {
   auth_type: AuthType;
+}
+
+interface ISetSelf {
+  self: ISelf | null;
 }
 
 export const auth_slice = createSlice({
@@ -27,8 +32,11 @@ export const auth_slice = createSlice({
     setAuthType(state: IInitialState, action: PayloadAction<ISetAuthType>) {
       state.auth_type = action.payload.auth_type;
     },
+    setSelf(state: IInitialState, action: PayloadAction<ISetSelf>) {
+      state.self = action.payload.self;
+    },
   },
 });
 
-export const { setAuthType } = auth_slice.actions;
+export const { setAuthType, setSelf } = auth_slice.actions;
 export const auth_reducer = auth_slice.reducer;

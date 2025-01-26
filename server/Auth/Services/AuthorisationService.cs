@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text.Json;
 using Auth.Entities;
 using Auth.Interfaces.Services;
 using Auth.Results;
@@ -17,7 +18,7 @@ namespace Auth.Services
 
         public AuthoriseResult Authorise(string access_token)
         {
-            AR.AuthoriseResult result = new AuthoriseResult { Self = null, Error = null };
+            AR.AuthoriseResult result = new AuthoriseResult { };
 
             AR.TokenValidationResult tokenValidationResult = _accessTokenService.Validate(
                 access_token
@@ -38,26 +39,23 @@ namespace Auth.Services
             }
 
             List<Claim> claims = tokenValidationResult.Claims;
-            string? userId = claims
-                .Where(c => c.Type == "user_id")
+            string? selfJson = claims
+                .Where(c => c.Type == "self")
                 .Select(c => c.Value)
                 .FirstOrDefault();
-            string? username = claims
-                .Where(c => c.Type == "username")
-                .Select(c => c.Value)
-                .FirstOrDefault();
-            if (!Guid.TryParse(userId, out var userGuid))
+            if (selfJson == null)
             {
-                result.Error = "Failed to resolve user_id claim";
+                result.Error = "Failed to find self claim";
                 return result;
             }
-            if (string.IsNullOrWhiteSpace(username))
+            Self? self = JsonSerializer.Deserialize<Self>(selfJson);
+            if (self == null)
             {
-                result.Error = "Failed to resolve username claim";
+                result.Error = "Failed to deserialise self";
                 return result;
             }
-
-            result.Self = new Self { Id = userGuid, Username = username };
+            result.AccessToken = tokenValidationResult.AccessToken;
+            result.Self = self;
             return result;
         }
     }

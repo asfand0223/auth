@@ -4,7 +4,8 @@ namespace Auth.Results
 {
     public class TokenValidationResult
     {
-        public List<Claim>? Claims { get; set; }
+        public string? AccessToken { get; set; }
+        public required List<Claim> Claims { get; set; }
         public bool Valid { get; set; }
         public bool Expired { get; set; }
     }

@@ -55,6 +55,7 @@ namespace Auth.Utils
                 );
                 return new AR.TokenValidationResult
                 {
+                    AccessToken = token,
                     Claims = claimsPrincipal.Claims.ToList(),
                     Valid = true,
                     Expired = false,
@@ -64,7 +65,8 @@ namespace Auth.Utils
             {
                 return new AR.TokenValidationResult
                 {
-                    Claims = null,
+                    AccessToken = null,
+                    Claims = new List<Claim>(),
                     Valid = false,
                     Expired = true,
                 };
@@ -73,7 +75,8 @@ namespace Auth.Utils
             {
                 return new AR.TokenValidationResult
                 {
-                    Claims = null,
+                    AccessToken = null,
+                    Claims = new List<Claim>(),
                     Valid = false,
                     Expired = false,
                 };

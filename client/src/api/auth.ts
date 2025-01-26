@@ -70,3 +70,17 @@ export const register = async ({
   }
   return res;
 };
+
+export interface ISelf {
+  user_id: string;
+  username: string;
+}
+
+export const self = async (): Promise<ISelf | null> => {
+  const response = await axios.get(
+    `${process.env.NEXT_PUBLIC_AUTH_URL as string}/self`,
+    { validateStatus: () => true, withCredentials: true },
+  );
+  if (response.status !== 200) return null;
+  return response.data;
+};

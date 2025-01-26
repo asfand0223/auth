@@ -6,11 +6,11 @@ import styles from "./page.module.scss";
 import Auth from "@/components/auth/auth";
 
 const Home = () => {
-  const { access_token } = useSelector((state: RootState) => state.auth);
+  const { self } = useSelector((state: RootState) => state.auth);
   return (
     <div className={styles.container}>
-      {access_token && <Welcome />}
-      {!access_token && <Auth />}
+      {self && <Welcome />}
+      {!self && <Auth />}
     </div>
   );
 };

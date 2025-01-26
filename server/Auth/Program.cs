@@ -34,6 +34,7 @@ builder.Services.AddScoped<IAuthenticationValidationService, AuthenticationValid
 builder.Services.AddScoped<IAuthorisationService, AuthorisationServcie>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAccessTokenService, AccessTokenService>();
+builder.Services.AddScoped<ISelfService, SelfService>();
 
 builder.Services.AddControllers();
 

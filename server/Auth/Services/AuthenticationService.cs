@@ -39,7 +39,6 @@ namespace Auth.Services
                 result.Error = "Failed to create user";
                 return result;
             }
-
             result.AccessToken = _acessTokenService.Generate(id.Value, dto.Username);
             return result;
         }

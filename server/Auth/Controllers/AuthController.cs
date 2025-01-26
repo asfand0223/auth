@@ -42,11 +42,23 @@ namespace Auth.Controllers
                 {
                     return Unauthorized(authoriseResult.Error);
                 }
+                if (string.IsNullOrWhiteSpace(authoriseResult.AccessToken))
+                {
+                    throw new Exception();
+                }
                 if (authoriseResult.Self == null)
                 {
                     throw new Exception();
                 }
 
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = DateTime.Now.AddMinutes(_c.Value.Jwt.ExpiresIn.TotalMinutes),
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                };
+                Response.Cookies.Append("access_token", authoriseResult.AccessToken, cookieOptions);
                 return Ok(authoriseResult.Self);
             }
             catch (Exception ex)
