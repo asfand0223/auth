@@ -8,7 +8,7 @@ namespace Auth.Utils
 {
     public static class Jwt
     {
-        public static string GenerateToken(
+        public static string Generate(
             string secret_key,
             string issuer,
             string audience,
@@ -28,7 +28,7 @@ namespace Auth.Utils
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public static Results.TokenValidationResult ValidateToken(
+        public static Results.TokenValidationResult Validate(
             string token,
             string secret_key,
             string issuer,

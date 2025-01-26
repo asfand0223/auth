@@ -6,6 +6,6 @@ namespace Auth.Interfaces.Services
     public interface IAuthenticationService
     {
         public Task<RegisterResult> Register(RegisterDTO registerDTO);
-        public LoginResult Login(LoginDTO loginDTO);
+        public Task<LoginResult> Login(LoginDTO loginDTO);
     }
 }

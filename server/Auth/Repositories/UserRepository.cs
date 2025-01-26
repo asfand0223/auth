@@ -15,7 +15,15 @@ namespace Auth.Repositories
 
         public User? GetByUsername(string username)
         {
-            return _context.Users.FirstOrDefault((User u) => u.Username == username);
+            try
+            {
+                return _context.Users.FirstOrDefault((User u) => u.Username == username);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("UserRepository - GetByUsername: " + ex);
+                return null;
+            }
         }
 
         public async Task<Guid?> Create(string username, string password)

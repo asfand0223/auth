@@ -31,13 +31,14 @@ namespace Auth.Controllers
         {
             try
             {
+                // read access_token from HttpOnly cookie
                 string? access_token = Request.Cookies["access_token"];
                 Response.Cookies.Delete("access_token");
                 if (string.IsNullOrWhiteSpace(access_token))
                 {
                     return Unauthorized(new APIError { Error = "No access token found" });
                 }
-
+                // Check if user is authorised
                 AuthoriseResult authoriseResult = __authorisationService.Authorise(access_token);
                 if (!string.IsNullOrWhiteSpace(authoriseResult.Error))
                 {
@@ -51,7 +52,8 @@ namespace Auth.Controllers
                 {
                     throw new Exception();
                 }
-
+                /* User is authorised, so create new HttpOnly cookie with existing
+                (or potentially refreshed) access_token */
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
@@ -74,13 +76,13 @@ namespace Auth.Controllers
         {
             try
             {
+                // Check if DTO attribute constraints violated
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
                 }
-
+                // Register user
                 RegisterResult result = await _authenticationService.Register(registerDTO);
-
                 if (!string.IsNullOrWhiteSpace(result.Error))
                 {
                     return Unauthorized(new APIError { Error = result.Error });
@@ -89,7 +91,7 @@ namespace Auth.Controllers
                 {
                     throw new Exception("Failed to generate access token");
                 }
-
+                // Registration successful - create HttpOnly cookie to store access_token
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
@@ -108,17 +110,18 @@ namespace Auth.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginDTO loginDTO)
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
             try
             {
+                // Check if DTO attribute constraints violated
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
                 }
 
-                LoginResult result = _authenticationService.Login(loginDTO);
-
+                // Log user in
+                LoginResult result = await _authenticationService.Login(loginDTO);
                 if (!string.IsNullOrWhiteSpace(result.Error))
                 {
                     return BadRequest(new APIError { Error = result.Error });
@@ -127,7 +130,7 @@ namespace Auth.Controllers
                 {
                     throw new Exception("Failed to generate access token");
                 }
-
+                // Login successful - create HttpOnly cookie to store access_token
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,

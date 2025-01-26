@@ -18,8 +18,9 @@ namespace Auth.Services
 
         public AuthoriseResult Authorise(string access_token)
         {
+            // Prepare result object to return
             AR.AuthoriseResult result = new AuthoriseResult { };
-
+            // Validate access token
             AR.TokenValidationResult tokenValidationResult = _accessTokenService.Validate(
                 access_token
             );
@@ -38,7 +39,7 @@ namespace Auth.Services
                 result.Error = "No claims found";
                 return result;
             }
-
+            // Token is valid - get self
             List<Claim> claims = tokenValidationResult.Claims;
             string? selfJson = claims
                 .Where(c => c.Type == "self")
@@ -55,6 +56,7 @@ namespace Auth.Services
                 result.Error = "Failed to deserialise self";
                 return result;
             }
+
             result.AccessToken = tokenValidationResult.AccessToken;
             result.Self = self;
             return result;

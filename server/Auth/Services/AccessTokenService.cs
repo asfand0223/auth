@@ -24,7 +24,7 @@ namespace Auth.Services
         {
             Self self = _selfService.Generate(userId, username);
             string selfJson = JsonSerializer.Serialize<Self>(self);
-            return U.Jwt.GenerateToken(
+            return U.Jwt.Generate(
                 _c.Value.Jwt.Key,
                 _c.Value.Jwt.Issuer,
                 _c.Value.Jwt.Audience,
@@ -35,7 +35,7 @@ namespace Auth.Services
 
         public AR.TokenValidationResult Validate(string access_token)
         {
-            return U.Jwt.ValidateToken(
+            return U.Jwt.Validate(
                 access_token,
                 _c.Value.Jwt.Key,
                 _c.Value.Jwt.Issuer,

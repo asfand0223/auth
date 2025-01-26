@@ -10,21 +10,26 @@ namespace Auth.Services
         private readonly IAuthenticationValidationService _authenticationValidationService;
         private readonly IUserService _userService;
         private readonly IAccessTokenService _acessTokenService;
+        private readonly IRefreshTokenService _refreshTokenService;
 
         public AuthenticationService(
             IAuthenticationValidationService authenticationValidationService,
             IUserService userService,
-            IAccessTokenService accessTokenService
+            IAccessTokenService accessTokenService,
+            IRefreshTokenService refreshTokenService
         )
         {
             _authenticationValidationService = authenticationValidationService;
             _userService = userService;
             _acessTokenService = accessTokenService;
+            _refreshTokenService = refreshTokenService;
         }
 
         public async Task<RegisterResult> Register(RegisterDTO dto)
         {
-            RegisterResult result = new RegisterResult { AccessToken = null, Error = null };
+            // Prepare result object to return
+            RegisterResult result = new RegisterResult { };
+            // Validate registration details
             ValidateRegisterResult validateRegisterResult =
                 _authenticationValidationService.ValidateRegister(dto);
             if (validateRegisterResult.Error != null)
@@ -32,20 +37,30 @@ namespace Auth.Services
                 result.Error = validateRegisterResult.Error;
                 return result;
             }
-
-            Guid? id = await _userService.Create(dto.Username, dto.Password);
-            if (id == null)
+            // Details validated - create user in db
+            Guid? userId = await _userService.Create(dto.Username, dto.Password);
+            if (userId == null)
             {
                 result.Error = "Failed to create user";
                 return result;
             }
-            result.AccessToken = _acessTokenService.Generate(id.Value, dto.Username);
+            // User created - create refresh token in db
+            Guid? refreshTokenId = await _refreshTokenService.Create(userId.Value);
+            if (refreshTokenId == null)
+            {
+                result.Error = "Failed to create refresh token";
+                return result;
+            }
+
+            result.AccessToken = _acessTokenService.Generate(userId.Value, dto.Username);
             return result;
         }
 
-        public LoginResult Login(LoginDTO dto)
+        public async Task<LoginResult> Login(LoginDTO dto)
         {
-            LoginResult result = new LoginResult { AccessToken = null, Error = null };
+            // Prepare result object to return
+            LoginResult result = new LoginResult { };
+            // Validate login details
             ValidateLoginResult validateLoginResult =
                 _authenticationValidationService.ValidateLogin(dto);
             if (validateLoginResult.Error != null)
@@ -53,13 +68,21 @@ namespace Auth.Services
                 result.Error = validateLoginResult.Error;
                 return result;
             }
-
+            // Details validated - get user for access token claims construction
             User? user = _userService.GetByUsername(dto.Username);
             if (user == null)
             {
                 result.Error = "User not found";
                 return result;
             }
+            // User exists and is logged in - create refresh token in db
+            Guid? refreshTokenId = await _refreshTokenService.Create(user.Id);
+            if (refreshTokenId == null)
+            {
+                result.Error = "Failed to create refresh token";
+                return result;
+            }
+
             result.AccessToken = _acessTokenService.Generate(user.Id, dto.Username);
             return result;
         }

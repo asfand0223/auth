@@ -17,14 +17,14 @@ namespace Auth.Services
 
         public ValidateRegisterResult ValidateRegister(RegisterDTO dto)
         {
-            ValidateRegisterResult result = new ValidateRegisterResult { Error = null };
+            ValidateRegisterResult result = new ValidateRegisterResult { };
+
             User? existingU = _userRepository.GetByUsername(dto.Username);
             if (existingU != null)
             {
                 result.Error = "Username taken";
                 return result;
             }
-
             if (dto.Password != dto.ConfirmPassword)
             {
                 result.Error = "Passwords do not match";
@@ -36,7 +36,8 @@ namespace Auth.Services
 
         public ValidateLoginResult ValidateLogin(LoginDTO dto)
         {
-            ValidateLoginResult result = new ValidateLoginResult { Error = null };
+            ValidateLoginResult result = new ValidateLoginResult { };
+
             User? existingU = _userRepository.GetByUsername(dto.Username);
             if (existingU == null)
             {
@@ -48,6 +49,7 @@ namespace Auth.Services
                 result.Error = "Incorrect password";
                 return result;
             }
+
             return result;
         }
     }
