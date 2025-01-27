@@ -31,7 +31,7 @@ const Register = () => {
   useEffect(() => {
     dispatch(setError({ error: null }));
     dispatch(setValidationErrors({ validation_errors: null }));
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(
@@ -44,7 +44,7 @@ const Register = () => {
           password === confirm_password,
       }),
     );
-  }, [username, password, confirm_password]);
+  }, [dispatch, username, password, confirm_password]);
 
   const handleUsernameInputChange = () => {
     dispatch(setUsername({ username: username_ref.current?.value ?? "" }));

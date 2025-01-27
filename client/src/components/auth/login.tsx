@@ -26,13 +26,13 @@ const Login = () => {
   useEffect(() => {
     dispatch(setError({ error: null }));
     dispatch(setValidationErrors({ validation_errors: null }));
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(
       setIsSubmittable({ is_submittable: username !== "" && password !== "" }),
     );
-  }, [username, password]);
+  }, [dispatch, username, password]);
 
   const handleUsernameInputChange = () => {
     dispatch(setUsername({ username: username_ref.current?.value ?? "" }));

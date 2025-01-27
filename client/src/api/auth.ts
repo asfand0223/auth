@@ -25,7 +25,7 @@ export const login = async ({
     },
     { validateStatus: () => true, withCredentials: true },
   );
-  var res = { validation_errors: null, error: null, status: response.status };
+  const res = { validation_errors: null, error: null, status: response.status };
   if (response.status == 200) return res;
   if (response.data.hasOwnProperty("error")) {
     res.error = response.data.error;
@@ -61,7 +61,7 @@ export const register = async ({
     },
     { validateStatus: () => true, withCredentials: true },
   );
-  var res = { validation_errors: null, error: null, status: response.status };
+  const res = { validation_errors: null, error: null, status: response.status };
   if (response.status == 200) return res;
   if (response.data.hasOwnProperty("error")) {
     res.error = response.data.error;

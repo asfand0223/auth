@@ -14,7 +14,7 @@ const Home = () => {
       dispatch(setSelf({ self: response }));
     };
     getSelf();
-  }, []);
+  }, [dispatch]);
   return (
     <div className={styles.container}>
       <Auth />

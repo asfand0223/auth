@@ -1,0 +1,41 @@
+services:
+  # Frontend service
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+    networks:
+      - auth-network
+  # Backend service
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=auth;Username=auth;Password=auth0223!;
+    depends_on:
+      - db
+    networks:
+      - auth-network
+  # Database
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=auth
+      - POSTGRES_PASSWORD=auth0223!
+      - POSTGRES_DB=auth
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - auth-network
+networks:
+  auth-network:
+    driver: bridge
