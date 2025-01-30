@@ -1,21 +1,19 @@
 import React, { useEffect, useRef } from "react";
 import styles from "@/styles/auth/register.module.scss";
-import { useDispatch } from "react-redux";
 import { setUsername, setPassword, setConfirmPassword } from "@/redux/register";
-import { register, authorise } from "@/api/auth";
+import { register } from "@/api/auth";
 import {
   setError,
   setValidationErrors,
   setIsSubmittable,
 } from "@/redux/register";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { RootState, useAppDispatch } from "@/redux/store";
 import Error from "./error";
 import ValidationErrors from "./validation_errors";
-import { setSelf } from "@/redux/auth";
 
 const Register = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const {
     error,
     validation_errors,
@@ -75,23 +73,13 @@ const Register = () => {
         password_ref.current.value !== confirm_password_ref.current.value
       )
         return;
-      const response = await register({
-        username: username_ref.current.value,
-        password: password_ref.current.value,
-        confirm_password: confirm_password_ref.current.value,
-      });
-      if (response.status === 200) {
-        const response = await authorise();
-        dispatch(setSelf({ self: response }));
-      } else if (response.error) {
-        dispatch(setError({ error: { message: response.error } }));
-      } else {
-        dispatch(
-          setValidationErrors({
-            validation_errors: response.validation_errors,
-          }),
-        );
-      }
+      await dispatch(
+        register({
+          username: username_ref.current.value,
+          password: password_ref.current.value,
+          confirm_password: confirm_password_ref.current.value,
+        }),
+      );
     } catch (e) {
       console.error(e);
     }

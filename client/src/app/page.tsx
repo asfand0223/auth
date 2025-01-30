@@ -3,17 +3,15 @@ import styles from "./page.module.scss";
 import Auth from "@/components/auth/auth";
 import { useEffect } from "react";
 import { authorise } from "@/api/auth";
-import { setSelf } from "@/redux/auth";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "@/redux/store";
 
 const Home = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   useEffect(() => {
-    const getSelf = async () => {
-      const response = await authorise();
-      dispatch(setSelf({ self: response }));
+    const authoriseAsync = async () => {
+      await dispatch(authorise());
     };
-    getSelf();
+    authoriseAsync();
   }, [dispatch]);
   return (
     <div className={styles.container}>

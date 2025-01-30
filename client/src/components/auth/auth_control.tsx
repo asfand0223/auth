@@ -1,12 +1,11 @@
 import React from "react";
 import { AuthType, setAuthType } from "@/redux/auth";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { RootState, useAppDispatch } from "@/redux/store";
 import styles from "@/styles/auth/auth_control.module.scss";
-import { useDispatch } from "react-redux";
 
 const AuthControl = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { auth_type } = useSelector((state: RootState) => state.auth);
 
   const handleClick = (auth_type: AuthType) => {

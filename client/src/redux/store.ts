@@ -1,7 +1,8 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, ThunkDispatch, UnknownAction } from "@reduxjs/toolkit";
 import { auth_reducer } from "./auth";
 import { login_reducer } from "./login";
 import { register_reducer } from "./register";
+import { useDispatch } from "react-redux";
 
 export const store = configureStore({
   reducer: {
@@ -13,4 +14,5 @@ export const store = configureStore({
 });
 
 export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export type AppDispatch = ThunkDispatch<RootState, unknown, UnknownAction>;
+export const useAppDispatch = () => useDispatch<AppDispatch>();
