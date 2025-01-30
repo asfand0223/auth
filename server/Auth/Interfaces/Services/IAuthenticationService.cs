@@ -7,5 +7,6 @@ namespace Auth.Interfaces.Services
     {
         public Task<RegisterResult> Register(RegisterDTO registerDTO);
         public Task<LoginResult> Login(LoginDTO loginDTO);
+        public Task<bool> Logout(Guid userId);
     }
 }

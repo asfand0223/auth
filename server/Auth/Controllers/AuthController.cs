@@ -1,6 +1,7 @@
 using Auth.Configuration;
 using Auth.DTOs;
 using Auth.Entities;
+using Auth.Entities.Results;
 using Auth.Interfaces.Services;
 using Auth.Results;
 using Microsoft.AspNetCore.Mvc;
@@ -13,17 +14,20 @@ namespace Auth.Controllers
     {
         private readonly IOptions<Config> _c;
         private readonly IAuthenticationService _authenticationService;
-        private readonly IAuthorisationService __authorisationService;
+        private readonly IAuthorisationService _authorisationService;
+        private readonly ISelfService _selfService;
 
         public AuthController(
             IOptions<Config> c,
             IAuthenticationService authenticationService,
-            IAuthorisationService authorisationService
+            IAuthorisationService authorisationService,
+            ISelfService selfService
         )
         {
             _c = c;
             _authenticationService = authenticationService;
-            __authorisationService = authorisationService;
+            _authorisationService = authorisationService;
+            _selfService = selfService;
         }
 
         [HttpGet("self")]
@@ -39,7 +43,7 @@ namespace Auth.Controllers
                     return Unauthorized(new APIError { Error = "No access token found" });
                 }
                 // Check if user is authorised
-                AuthoriseResult authoriseResult = await __authorisationService.Authorise(
+                AuthoriseResult authoriseResult = await _authorisationService.Authorise(
                     access_token
                 );
                 if (!string.IsNullOrWhiteSpace(authoriseResult.Error))
@@ -93,7 +97,7 @@ namespace Auth.Controllers
                 }
                 if (result.AccessToken == null)
                 {
-                    throw new Exception("Failed to generate access token");
+                    throw new Exception("Authentication service failed to return an access token");
                 }
                 // Registration successful - create HttpOnly cookie to store access_token
                 var cookieOptions = new CookieOptions
@@ -134,7 +138,7 @@ namespace Auth.Controllers
                 }
                 if (result.AccessToken == null)
                 {
-                    throw new Exception("Failed to generate access token");
+                    throw new Exception("Authentication service failed to return an access token");
                 }
                 // Login successful - create HttpOnly cookie to store access_token
                 var cookieOptions = new CookieOptions
@@ -153,6 +157,44 @@ namespace Auth.Controllers
             {
                 Console.WriteLine("AuthController - Login: " + ex);
                 return StatusCode(500, new APIError { Error = "Failed to login" });
+            }
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                string? access_token = Request.Cookies["access_token"];
+                if (string.IsNullOrWhiteSpace(access_token))
+                {
+                    return BadRequest("Invalid access token");
+                }
+
+                SelfResult selfResult = _selfService.GetSelf(access_token);
+                if (!string.IsNullOrWhiteSpace(selfResult.Error))
+                {
+                    throw new Exception(selfResult.Error);
+                }
+                if (selfResult.Self == null)
+                {
+                    throw new Exception("Invalid self");
+                }
+
+                bool isLoggedOut = await _authenticationService.Logout(selfResult.Self.UserId);
+                if (!isLoggedOut)
+                {
+                    throw new Exception(
+                        "Authentication service failed to complete logout operation"
+                    );
+                }
+                Response.Cookies.Delete("access_token");
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("AuthController - Logout: " + ex);
+                return StatusCode(500, new APIError { Error = "Failed to logout" });
             }
         }
     }

@@ -86,5 +86,10 @@ namespace Auth.Services
             result.AccessToken = _acessTokenService.Generate(user.Id, dto.Username);
             return result;
         }
+
+        public async Task<bool> Logout(Guid userId)
+        {
+            return await _refreshTokenService.DeleteByUserId(userId);
+        }
     }
 }

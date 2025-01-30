@@ -65,5 +65,21 @@ namespace Auth.Repositories
                 return false;
             }
         }
+
+        public async Task<bool> DeleteByUserId(Guid userId)
+        {
+            try
+            {
+                await _context
+                    .RefreshTokens.Where((RefreshToken rt) => rt.UserId == userId)
+                    .ExecuteDeleteAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("RefreshTokenRepository - DeleteByUserId: " + ex);
+                return false;
+            }
+        }
     }
 }

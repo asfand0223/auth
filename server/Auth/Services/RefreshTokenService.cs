@@ -56,5 +56,15 @@ namespace Auth.Services
 
             return _accessTokenService.Generate(self.UserId, self.Username);
         }
+
+        public async Task<bool> Delete(Guid id)
+        {
+            return await _refreshTokenRepository.Delete(id);
+        }
+
+        public async Task<bool> DeleteByUserId(Guid userId)
+        {
+            return await _refreshTokenRepository.DeleteByUserId(userId);
+        }
     }
 }

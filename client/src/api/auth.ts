@@ -83,3 +83,15 @@ export const register = ({
     }
   };
 };
+
+export const logout = () => {
+  return async (dispatch: AppDispatch) => {
+    const logout_response = await axios.post(
+      `${process.env.NEXT_PUBLIC_AUTH_URL as string}/logout`,
+      {},
+      { validateStatus: () => true, withCredentials: true },
+    );
+    if (logout_response.status !== 200) return;
+    dispatch(setSelf({ self: null }));
+  };
+};
