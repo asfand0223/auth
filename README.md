@@ -1,1 +1,1 @@
-JTW Auth
+JWT AUTH
